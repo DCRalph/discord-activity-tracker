@@ -35,6 +35,8 @@ client.once('ready', () => {
 client.on('presenceUpdate', (oldPresence, newPresence) => {
   // console.log('Presence update')
 
+  if (newPresence.user?.bot) return
+
   handleActivity(oldPresence, newPresence)
 })
 
