@@ -244,6 +244,8 @@ async function handleActivityV2NewActivity(
         name: activity.name,
 
         startedAt: activity.timestamps.start,
+        endedAt: null,
+        duration: null,
       },
     })
 
