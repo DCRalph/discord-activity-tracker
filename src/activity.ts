@@ -199,6 +199,7 @@ async function handleActivity(
       })
 
       const endedAt = activity.timestamps?.end || now
+      const startedAt = activity.timestamps?.start || now
 
       if (activityRecord) {
         console.log(
@@ -212,7 +213,7 @@ async function handleActivity(
           data: {
             endedAt: endedAt,
             duration:
-              (endedAt.getTime() - activityRecord.startedAt.getTime()) / 1000,
+              (endedAt.getTime() - startedAt.getTime()) / 1000,
           },
         })
       } else {
