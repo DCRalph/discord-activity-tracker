@@ -100,9 +100,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
     return
   }
 
-  console.log(
-    `Processing presence update for ${discordUser.username} in ${guild.name}`
-  )
+  console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
   await handleActivityV2(oldPresence, newPresence, guild)
 })
