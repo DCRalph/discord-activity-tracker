@@ -26,6 +26,8 @@ const botActivity: Discord.ActivityOptions = {
   type: Discord.ActivityType.Playing,
 }
 
+let userGuildMap = new Map<string, string>()
+
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user?.tag}!`)
 
@@ -77,6 +79,25 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   // console.log('Presence update')
 
   if (newPresence.user?.bot) return
+
+  const discordId = newPresence.user?.id
+  const username = newPresence.user?.username
+  const guildId = newPresence.guild?.id
+  const guildName = newPresence.guild?.name
+
+  if (!discordId) return
+
+  // make sure if user is in more than one guild, we only handle the first one
+  const userAllowedGuild = userGuildMap.get(discordId)
+
+  if (!userAllowedGuild) {
+    userGuildMap.set(discordId, guildId)
+  } else if (userAllowedGuild !== guildId) {
+    console.log(`User ${username} is in multiple guilds, skipping`)
+    return
+  }
+
+  console.log(`Processing presence update for ${username} in ${guildName}`)
 
   await handleActivityV2(oldPresence, newPresence)
 })
