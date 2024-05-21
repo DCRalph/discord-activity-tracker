@@ -12,6 +12,8 @@ const activityTypeMap = {
   5: 'Competing',
 }
 
+let usersProsessing = new Set<String>()
+
 async function makeUser(user: Discord.User) {
   const userRecord = await prisma.user.findFirst({
     where: {
@@ -40,6 +42,13 @@ async function handleActivity(
   const discordUser = newPresence.user
 
   if (!discordUser) return
+
+  if (usersProsessing.has(discordUser.id)) {
+    console.log(`[${discordUser.username}] Already processing. Skipping...`)
+    return
+  }
+
+  usersProsessing.add(discordUser.id)
 
   const user = await makeUser(discordUser)
 
@@ -225,6 +234,8 @@ async function handleActivity(
       }
     }
   }
+
+  usersProsessing.delete(discordUser.id)
 }
 
 export { handleActivity }
