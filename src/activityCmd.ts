@@ -17,6 +17,10 @@ function prettySeconds(seconds: number) {
   if (minutes) result += `${minutes} m `
   if (seconds) result += `${seconds} s `
 
+  if (!result) {
+    result = '0 s'
+  }
+
   return result.trim()
 }
 
@@ -175,8 +179,8 @@ async function handleActivityLeaderboardCmd(
     }
   )
 
-  // embed.addFields(fields)
   console.log(fields)
+  embed.addFields(fields)
 
   interaction.reply({ embeds: [embed] })
 }
