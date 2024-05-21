@@ -125,7 +125,7 @@ async function handleActivity(
           userId: user.id,
           activityType: 'status',
 
-          type: newStatus,
+          type: newStatus ?? 'unknown',
           name: 'unknown previous status',
 
           startedAt: now,
