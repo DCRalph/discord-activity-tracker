@@ -31,36 +31,40 @@ client.once('ready', async () => {
 
   client.user?.setActivity(botActivity)
 
-  const g = await client.guilds.fetch('689384013047005199')
-  const c = await g.commands.fetch()
+  const guilds = [...client.guilds.cache.values()]
 
-  console.log(c)
+  console.log(guilds)
 
-  c.forEach(async (command) => {
-    console.log(command)
-    await command.delete()
-  })
+  for (const guild of guilds) {
+    const g = await client.guilds.fetch(guild.id)
+    const c = await g.commands.fetch()
+
+    console.log(`guild: ${guild.name}, commands: ${c.size}`)
+
+    c.forEach(async (command) => {
+      await command.delete()
+    })
+  }
 
   let commands = await client.application.commands.fetch()
+  console.log(`global commands: ${commands.size}`)
 
-  console.log(commands)
   commands.forEach(async (command) => {
-    console.log(command)
     await command.delete()
   })
 
-  g.commands.create({
-    name: 'activity',
-    description: 'Get user activity',
-    options: [
-      {
-        name: 'user',
-        type: Discord.ApplicationCommandOptionType.User,
-        description: 'The user to get activity for',
-        required: true,
-      },
-    ],
-  })
+  // client.application.commands.create({
+  //   name: 'activity',
+  //   description: 'Get user activity',
+  //   options: [
+  //     {
+  //       name: 'user',
+  //       type: Discord.ApplicationCommandOptionType.User,
+  //       description: 'The user to get activity for',
+  //       required: true,
+  //     },
+  //   ],
+  // })
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
