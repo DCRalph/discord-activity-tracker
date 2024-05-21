@@ -347,15 +347,22 @@ async function handleActivityV2OldActivity(
 
     if (
       activity.timestamps == null ||
-      activity.timestamps.start == null ||
-      activity.timestamps.end == null
+      activity.timestamps.start == null
+      // || activity.timestamps.end == null
     ) {
       console.log(
-        `[${user.username}, ${guild.name}] Old activity record has no timestamps. timestamps: ${activity.timestamps != null}, start: ${activity.timestamps?.start != null}, end: ${activity.timestamps?.end != null}. Skipping...`
+        `[${user.username}, ${
+          guild.name
+        }] Old activity record has no timestamps. timestamps: ${
+          activity.timestamps != null
+        }, start: ${activity.timestamps?.start != null}, end: ${
+          activity.timestamps?.end != null
+        }. Skipping...`
       )
-      console.log(activity)
       continue
     }
+
+    const endedAt = activity.timestamps.end || now
 
     // find the last activity record
     const activityRecord = await prisma.activity.findFirst({
@@ -383,11 +390,9 @@ async function handleActivityV2OldActivity(
           id: activityRecord.id,
         },
         data: {
-          endedAt: activity.timestamps.end,
+          endedAt: endedAt,
           duration:
-            (activity.timestamps.end.getTime() -
-              activity.timestamps.start.getTime()) /
-            1000,
+            (endedAt.getTime() - activity.timestamps.start.getTime()) / 1000,
         },
       })
     } else {
@@ -406,11 +411,9 @@ async function handleActivityV2OldActivity(
           details: activity.details,
 
           startedAt: activity.timestamps.start,
-          endedAt: activity.timestamps.end,
+          endedAt: endedAt,
           duration:
-            (activity.timestamps.end.getTime() -
-              activity.timestamps.start.getTime()) /
-            1000,
+            (endedAt.getTime() - activity.timestamps.start.getTime()) / 1000,
         },
       })
     }
@@ -431,7 +434,13 @@ async function handleActivityV2NewActivity(
 
     if (activity.timestamps == null || activity.timestamps.start == null) {
       console.log(
-        `[${user.username}, ${guild.name}] New activity record has no timestamps. timestamps: ${activity.timestamps != null}, start: ${activity.timestamps?.start != null}, end: ${activity.timestamps?.end != null}. Skipping...`
+        `[${user.username}, ${
+          guild.name
+        }] New activity record has no timestamps. timestamps: ${
+          activity.timestamps != null
+        }, start: ${activity.timestamps?.start != null}, end: ${
+          activity.timestamps?.end != null
+        }. Skipping...`
       )
       continue
     }
