@@ -248,7 +248,8 @@ async function handleActivity(
 async function handleActivityV2Status(
   oldStatus: string,
   newStatus: string,
-  user: User
+  user: User,
+  guild: Discord.Guild
 ) {
   const now = new Date()
 
@@ -257,7 +258,7 @@ async function handleActivityV2Status(
     // console.log('oldStatus:', oldStatus)
 
     console.log(
-      `[${user.username}] changed status from ${oldStatus} to ${newStatus}`
+      `[${user.username}, ${guild.name}] changed status from ${oldStatus} to ${newStatus}`
     )
 
     const lastStatusRecord = await prisma.activity.findFirst({
@@ -273,14 +274,16 @@ async function handleActivityV2Status(
 
     if (lastStatusRecord?.endedAt != null) {
       console.log(
-        `[${user.username}] Last status record is already ended. Skipping...`
+        `[${user.username}, ${guild.name}] Last status record is already ended. Skipping...`
       )
       return
     }
 
     if (lastStatusRecord) {
       // update the last status record
-      console.log(`[${user.username}] Updateing last status record`)
+      console.log(
+        `[${user.username}, ${guild.name}] Updateing last status record`
+      )
 
       await prisma.activity.update({
         where: {
@@ -296,7 +299,9 @@ async function handleActivityV2Status(
       })
 
       // create a new status record
-      console.log(`[${user.username}] Creating new status record for`)
+      console.log(
+        `[${user.username}, ${guild.name}] Creating new status record for`
+      )
       await prisma.activity.create({
         data: {
           userId: user.id,
@@ -310,7 +315,7 @@ async function handleActivityV2Status(
     } else {
       // create a new status record if there is no last status record
       console.log(
-        `[${user.username}] Creating new status record for. No last status record found. `
+        `[${user.username}, ${guild.name}] Creating new status record for. No last status record found. `
       )
       await prisma.activity.create({
         data: {
@@ -329,7 +334,8 @@ async function handleActivityV2Status(
 
 async function handleActivityV2OldActivity(
   oldPresence: Discord.Presence,
-  user: User
+  user: User,
+  guild: Discord.Guild
 ) {
   const now = new Date()
 
@@ -344,7 +350,7 @@ async function handleActivityV2OldActivity(
       activity.timestamps.end == null
     ) {
       console.log(
-        `[${user.username}] Activity record has no timestamps. Skipping...`
+        `[${user.username}, ${guild.name}] Activity record has no timestamps. Skipping...`
       )
       continue
     }
@@ -367,7 +373,7 @@ async function handleActivityV2OldActivity(
 
     if (activityRecord) {
       console.log(
-        `[${user.username}] Updating activity record for old activity`
+        `[${user.username}, ${guild.name}] Updating activity record for old activity`
       )
 
       await prisma.activity.update({
@@ -385,7 +391,7 @@ async function handleActivityV2OldActivity(
     } else {
       // create a new activity record if there is no last activity record
       console.log(
-        `[${user.username}] Creating activity record for old activity ${activity.name}`
+        `[${user.username}, ${guild.name}] Creating activity record for old activity ${activity.name}`
       )
 
       await prisma.activity.create({
@@ -411,7 +417,8 @@ async function handleActivityV2OldActivity(
 
 async function handleActivityV2NewActivity(
   newPresence: Discord.Presence,
-  user: User
+  user: User,
+  guild: Discord.Guild
 ) {
   const now = new Date()
 
@@ -422,7 +429,7 @@ async function handleActivityV2NewActivity(
 
     if (activity.timestamps == null || activity.timestamps.start == null) {
       console.log(
-        `[${user.username}] Activity record has no start timestamps. Skipping...`
+        `[${user.username}, ${guild.name}] Activity record has no start timestamps. Skipping...`
       )
       continue
     }
@@ -441,13 +448,13 @@ async function handleActivityV2NewActivity(
 
     if (existingActivity) {
       console.log(
-        `[${user.username}] Activity record already exists for ${activity.name}`
+        `[${user.username}, ${guild.name}] Activity record already exists for ${activity.name}`
       )
       continue
     }
 
     console.log(
-      `[${user.username}] Creating activity record for ${activity.name}...`
+      `[${user.username}, ${guild.name}] Creating activity record for ${activity.name}...`
     )
 
     const activityRecord = await prisma.activity.create({
@@ -467,7 +474,8 @@ async function handleActivityV2NewActivity(
 
 async function handleActivityV2(
   oldPresence: Discord.Presence | null,
-  newPresence: Discord.Presence
+  newPresence: Discord.Presence,
+  guild: Discord.Guild
 ) {
   const discordUser = newPresence.user
 
@@ -487,7 +495,7 @@ async function handleActivityV2(
   const newStatus = newPresence.status
 
   try {
-    await handleActivityV2Status(oldStatus, newStatus, user)
+    await handleActivityV2Status(oldStatus, newStatus, user, guild)
   } catch (error) {
     console.log('\n\n')
 
@@ -509,7 +517,7 @@ async function handleActivityV2(
 
   if (oldPresence !== null) {
     try {
-      await handleActivityV2OldActivity(oldPresence, user)
+      await handleActivityV2OldActivity(oldPresence, user, guild)
     } catch (error) {
       console.log('\n\n')
 
@@ -529,7 +537,7 @@ async function handleActivityV2(
     }
   }
   try {
-    await handleActivityV2NewActivity(newPresence, user)
+    await handleActivityV2NewActivity(newPresence, user, guild)
   } catch (error) {
     console.log('\n\n')
 
