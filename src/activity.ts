@@ -170,7 +170,7 @@ async function handleActivity(
         userId: user.id,
         activityType: 'activity',
 
-        type: activityTypeMap[activity.type],
+        type: activityTypeMap[activity.type] ?? 'unknown',
         name: activity.name,
         details: activity.details,
 

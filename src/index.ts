@@ -26,10 +26,32 @@ const botActivity: Discord.ActivityOptions = {
   type: Discord.ActivityType.Playing,
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
   console.log(`Logged in as ${client.user?.tag}!`)
 
   client.user?.setActivity(botActivity)
+
+  const g = await client.guilds.fetch("689384013047005199")
+  const c = await g.commands.fetch()
+
+  client.guilds.cache.forEach((guild) => {
+    guild.commands.cache.forEach((command) => {
+      command.delete()
+    })
+
+    guild.commands.create({
+      name: 'activity',
+      description: 'Get the activity of a user',
+      options: [
+        {
+          name: 'user',
+          type: Discord.ApplicationCommandOptionType.User,
+          description: 'The user you want to get the activity of',
+          required: true,
+        },
+      ],
+    })
+  })
 })
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
@@ -38,6 +60,60 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
   if (newPresence.user?.bot) return
 
   handleActivity(oldPresence, newPresence)
+})
+
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return
+
+  const { commandName } = interaction
+
+  if (commandName === 'activity') {
+    const user = interaction.options.get('user', true)?.user
+
+    const userRecord = await prisma.user.findFirst({
+      where: {
+        discordId: user.id,
+      },
+    })
+
+    if (!userRecord) {
+      interaction.reply('User not found')
+      return
+    }
+
+    const activityRecord = await prisma.activity.findMany({
+      where: {
+        userId: userRecord.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    let totals = {}
+
+    for (const activity of activityRecord) {
+      if (activity.activityType !== 'activity') continue
+
+      let duration = 0
+
+      if (!totals[activity.name]) totals[activity.name] = 0
+
+      if (activity.endedAt == null)
+        duration = (new Date().getTime() - activity.startedAt.getTime()) / 1000
+      else duration = activity.duration
+
+      totals[activity.name] += duration
+    }
+
+    let msg = `Activity for ${user.username}:\n`
+
+    for (const [name, duration] of Object.entries(totals)) {
+      msg += `${name}: ${duration}\n`
+    }
+
+    interaction.reply(msg)
+  }
 })
 
 client.login(process.env.DISCORD_TOKEN)
