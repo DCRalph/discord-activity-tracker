@@ -1,0 +1,28 @@
+{
+  "name": "discord-activity-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "test": "tsx"
+  },
+  "author": "me",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "chalk": "^5.3.0",
+    "discord.js": "^14.15.2",
+    "dotenv": "^16.4.5",
+    "prisma": "^5.14.0"
+  }
+}

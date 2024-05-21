@@ -1,0 +1,55 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  discordId   String   @unique
+  username String   
+
+
+  // status    Status[]
+  activities Activity[]
+}
+
+// model Status {
+//   id        String   @id @default(cuid())
+//   createdAt DateTime @default(now())
+
+//   userId    String
+//   user      User     @relation(fields: [userId], references: [id])
+
+//   status    String
+//   message   String?
+
+//   startedAt DateTime
+//   endedAt   DateTime?
+//   duration  Int?
+// }
+
+model Activity {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  activityType String
+
+  type      String
+  name      String?
+  details   String?
+
+  startedAt DateTime
+  endedAt   DateTime?
+  duration  Int?
+}
