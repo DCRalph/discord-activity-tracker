@@ -8,8 +8,8 @@ const activityTypeMap = {
   1: 'Streaming',
   2: 'Listening',
   3: 'Watching',
-  4: 'Custom',
-  5: 'Competing',
+  // 4: 'Custom',
+  // 5: 'Competing',
 }
 
 let usersProsessing = new Set<String>()
@@ -334,7 +334,7 @@ async function handleActivityV2OldActivity(
   const now = new Date()
 
   for (const activity of oldPresence.activities) {
-    if (activity.type != 0) continue
+    if (activity.type! in activityTypeMap == false) continue
 
     const typeText = activityTypeMap[activity.type] || 'unknown'
 
@@ -416,7 +416,7 @@ async function handleActivityV2NewActivity(
   const now = new Date()
 
   for (const activity of newPresence.activities) {
-    if (activity.type != 0) continue
+    if (activity.type! in activityTypeMap == false) continue
 
     const typeText = activityTypeMap[activity.type] || 'unknown'
 

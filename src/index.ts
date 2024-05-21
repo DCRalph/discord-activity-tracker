@@ -33,10 +33,9 @@ client.once('ready', async () => {
 
   const guilds = [...client.guilds.cache.values()]
 
-  console.log(guilds)
-
   let commands = await client.application.commands.fetch()
-  console.log(`global commands: ${commands.size}`)
+  console.log()
+  console.log(`Global commands: ${commands.size}`)
 
   commands.forEach(async (command) => {
     await command.delete()
@@ -45,8 +44,8 @@ client.once('ready', async () => {
   for (const guild of guilds) {
     const g = await client.guilds.fetch(guild.id)
     const c = await g.commands.fetch()
-
-    console.log(`guild: ${guild.name}, commands: ${c.size}`)
+    console.log()
+    console.log(`Guild: ${guild.name}, Commands: ${c.size}`)
 
     c.forEach(async (command) => {
       await command.delete()
@@ -70,7 +69,7 @@ client.once('ready', async () => {
       ],
     })
 
-    console.log(`commands created for ${guild.name}`)
+    console.log(`Commands created for ${guild.name}`)
   }
 })
 
