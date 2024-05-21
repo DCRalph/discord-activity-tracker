@@ -1,6 +1,30 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
-import pms from 'pretty-ms'
+
+function prettySeconds(seconds: number) {
+  // convert secconds to days, hours, minutes, seconds
+  // only include the largest unit that is not zero
+  const days = Math.floor(seconds / 86400)
+  seconds %= 86400
+  const hours = Math.floor(seconds / 3600)
+  seconds %= 3600
+  const minutes = Math.floor(seconds / 60)
+  seconds %= 60
+
+  let result = ''
+  if (days) {
+    result += `${days} days `
+  }
+  if (hours) {
+    result += `${hours} hours `
+  }
+  if (minutes) {
+    result += `${minutes} minutes `
+  }
+  if (seconds) {
+    result += `${seconds} seconds `
+  }
+}
 
 const prisma = new PrismaClient()
 
@@ -59,7 +83,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ).map(([name, duration]) => {
     return {
       name,
-      value: `${pms(duration * 1000)} seconds`,
+      value: `${prettySeconds(duration)} seconds`,
       inline: true,
     }
   })
@@ -69,7 +93,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ).map(([name, duration]) => {
     return {
       name,
-      value: `${pms(duration * 1000)} seconds`,
+      value: `${prettySeconds(duration)} seconds`,
       inline: true,
     }
   })
