@@ -351,7 +351,7 @@ async function handleActivityV2OldActivity(
       activity.timestamps.end == null
     ) {
       console.log(
-        `[${user.username}, ${guild.name}] Activity record has no timestamps. Skipping...`
+        `[${user.username}, ${guild.name}] Old activity record has no timestamps. timestamps: ${activity.timestamps != null}, start: ${activity.timestamps?.start != null}, end: ${activity.timestamps?.end != null}. Skipping...`
       )
       continue
     }
@@ -430,7 +430,7 @@ async function handleActivityV2NewActivity(
 
     if (activity.timestamps == null || activity.timestamps.start == null) {
       console.log(
-        `[${user.username}, ${guild.name}] Activity record has no start timestamps. Skipping...`
+        `[${user.username}, ${guild.name}] New activity record has no timestamps. timestamps: ${activity.timestamps != null}, start: ${activity.timestamps?.start != null}, end: ${activity.timestamps?.end != null}. Skipping...`
       )
       continue
     }
