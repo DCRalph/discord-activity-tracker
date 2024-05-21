@@ -353,6 +353,7 @@ async function handleActivityV2OldActivity(
       console.log(
         `[${user.username}, ${guild.name}] Old activity record has no timestamps. timestamps: ${activity.timestamps != null}, start: ${activity.timestamps?.start != null}, end: ${activity.timestamps?.end != null}. Skipping...`
       )
+      console.log(activity)
       continue
     }
 
