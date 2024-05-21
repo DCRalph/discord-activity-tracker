@@ -78,6 +78,9 @@ client.once('ready', async () => {
   console.log('Bot is ready')
   console.log('.')
   console.log('.')
+
+  client.users.fetch("472872051359612945", {cache:false, force:true}).then(user => {
+    user.send("<@472872051359612945> Bot is ready!").catch(console.error)
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
