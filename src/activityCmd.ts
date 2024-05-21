@@ -44,7 +44,12 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       discordId: discordUser.id,
     },
     include: {
-      activities: true,
+      activities: {
+        where: {
+          type: {
+            not: "offline"
+          }
+      },
     },
   })
 
@@ -177,7 +182,7 @@ async function handleActivityLeaderboardCmd(
     }
   )
 
-  console.log(fields)
+  // console.log(fields)
   embed.addFields(fields)
 
   interaction.reply({ embeds: [embed] })
