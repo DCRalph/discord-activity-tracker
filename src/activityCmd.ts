@@ -23,9 +23,21 @@ function prettySeconds(seconds: number) {
 const prisma = new PrismaClient()
 
 async function handleActivityCmd(interaction: Discord.CommandInteraction) {
+  const discordUser = interaction.options.get('user', true)?.user
+
+  if (!discordUser) {
+    interaction.reply('User required')
+    return
+  }
+
+  if (discordUser.bot) {
+    interaction.reply('Bot users are not supported')
+    return
+  }
+
   const user = await prisma.user.findUnique({
     where: {
-      discordId: interaction.user.id,
+      discordId: discordUser.id,
     },
     include: {
       activities: true,

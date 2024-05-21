@@ -124,18 +124,6 @@ client.on('interactionCreate', async (interaction) => {
   }
 
   if (commandName === 'activity') {
-    const user = interaction.options.get('user', true)?.user
-
-    if (!user) {
-      interaction.reply('User required')
-      return
-    }
-
-    if (user.bot) {
-      interaction.reply('Bot users are not supported')
-      return
-    }
-
     handleActivityCmd(interaction)
   }
 })
