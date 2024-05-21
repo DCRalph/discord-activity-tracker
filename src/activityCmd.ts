@@ -175,7 +175,8 @@ async function handleActivityLeaderboardCmd(
     }
   )
 
-  embed.addFields(fields)
+  // embed.addFields(fields)
+  console.log(fields)
 
   interaction.reply({ embeds: [embed] })
 }
