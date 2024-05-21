@@ -141,6 +141,8 @@ async function handleActivity(
   for (const activity of newPresence.activities) {
     if (activity.type == 4) continue
 
+    const typeText = activityTypeMap[activity.type] || 'unknown'
+
     // console.log(activity)
 
     const existingActivity = await prisma.activity.findFirst({
@@ -148,7 +150,7 @@ async function handleActivity(
         userId: user.id,
         activityType: 'activity',
 
-        type: activityTypeMap[activity.type],
+        type: typeText,
         name: activity.name,
 
         startedAt: activity.timestamps?.start,
@@ -170,7 +172,7 @@ async function handleActivity(
         userId: user.id,
         activityType: 'activity',
 
-        type: activityTypeMap[activity.type] || 'unknown',
+        type: typeText,
         name: activity.name,
         details: activity.details,
 
@@ -182,13 +184,14 @@ async function handleActivity(
   if (oldPresence !== null) {
     for (const activity of oldPresence.activities) {
       if (activity.type == 4) continue
+      const typeText = activityTypeMap[activity.type] || 'unknown'
       // console.log(activity)
       const activityRecord = await prisma.activity.findFirst({
         where: {
           userId: user.id,
           activityType: 'activity',
 
-          type: activityTypeMap[activity.type],
+          type: typeText,
           name: activity.name,
 
           startedAt: activity.timestamps?.start,
@@ -221,7 +224,7 @@ async function handleActivity(
             userId: user.id,
             activityType: 'activity',
 
-            type: activityTypeMap[activity.type],
+            type: typeText,
             name: activity.name,
             details: activity.details,
 
