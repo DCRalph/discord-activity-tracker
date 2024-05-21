@@ -1,5 +1,7 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
+import pms from 'pretty-ms'
+
 const prisma = new PrismaClient()
 
 async function handleActivityCmd(interaction: Discord.CommandInteraction) {
@@ -39,10 +41,10 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
         activity.duration ||
         ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
-      if (statusTotals[activity.name]) {
-        statusTotals[activity.name] += duration
+      if (statusTotals[activity.type]) {
+        statusTotals[activity.type] += duration
       } else {
-        statusTotals[activity.name] = duration
+        statusTotals[activity.type] = duration
       }
     }
   }
@@ -57,7 +59,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ).map(([name, duration]) => {
     return {
       name,
-      value: `${duration} seconds`,
+      value: `${pms(duration * 1000)} seconds`,
       inline: true,
     }
   })
@@ -67,7 +69,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ).map(([name, duration]) => {
     return {
       name,
-      value: `${duration} seconds`,
+      value: `${pms(duration * 1000)} seconds`,
       inline: true,
     }
   })
@@ -79,11 +81,14 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   })
   embed.addFields(activityFields)
 
-  embed.addFields({
-    name: 'Status',
-    value: 'Total status time',
-    inline: false,
-  })
+  embed.addFields([
+    { name: '\u200B', value: '\u200B' }, // Add a blank field
+    {
+      name: 'Status',
+      value: 'Total status time',
+      inline: false,
+    },
+  ])
   embed.addFields(statusFields)
 
   interaction.reply({ embeds: [embed] })

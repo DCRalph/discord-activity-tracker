@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
-import { handleActivity, handleActivityV2 } from './activity'
+import { handleActivityV2 } from './activity'
 import { handleActivityCmd } from './activityCmd'
 
 dotenv.config()
