@@ -12,18 +12,12 @@ function prettySeconds(seconds: number) {
   seconds %= 60
 
   let result = ''
-  if (days) {
-    result += `${days} days `
-  }
-  if (hours) {
-    result += `${hours} hours `
-  }
-  if (minutes) {
-    result += `${minutes} minutes `
-  }
-  if (seconds) {
-    result += `${seconds} seconds `
-  }
+  if (days) result += `${days} days `
+  if (hours) result += `${hours} hours `
+  if (minutes) result += `${minutes} minutes `
+  if (seconds) result += `${seconds} seconds `
+
+  return result.trim()
 }
 
 const prisma = new PrismaClient()
