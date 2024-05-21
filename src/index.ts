@@ -41,7 +41,7 @@ client.once('ready', async () => {
   console.log(`Global commands: ${commands.size}`)
 
   commands.forEach(async (command) => {
-    await command.delete()
+    // await command.delete()
   })
 
   for (const guild of guilds) {
@@ -51,7 +51,7 @@ client.once('ready', async () => {
     console.log(`Guild: ${guild.name}, Commands: ${c.size}`)
 
     c.forEach(async (command) => {
-      await command.delete()
+      // await command.delete()
     })
 
     await g.commands.create({
