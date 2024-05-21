@@ -75,9 +75,8 @@ client.once('ready', async () => {
   }
 
   console.log('Bot is ready')
-  console.log()
-  console.log()
-  console.log()
+  console.log('.')
+  console.log('.')
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
@@ -104,9 +103,8 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   await handleActivityV2(oldPresence, newPresence, guild)
 
   console.log(`[${discordUser.username}, ${guild.name}] Done`)
-  console.log()
-  console.log()
-  console.log()
+  console.log('.')
+  console.log('.')
 })
 
 client.on('interactionCreate', async (interaction) => {

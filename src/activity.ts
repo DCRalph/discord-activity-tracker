@@ -498,7 +498,8 @@ async function handleActivityV2(
 
   const now = new Date()
 
-  console.log('\n\n')
+  console.log('.')
+  console.log('.')
 
   // ########## online status ##########
 
@@ -508,7 +509,8 @@ async function handleActivityV2(
   try {
     await handleActivityV2Status(oldStatus, newStatus, user, guild)
   } catch (error) {
-    console.log('\n\n')
+    console.log('.')
+    console.log('.')
 
     console.log(
       `[${discordUser.username}, ${guild.name}] Error on handle status: ${error}`
@@ -523,7 +525,8 @@ async function handleActivityV2(
 
     console.log(`[${discordUser.username}, ${guild.name}] user: ${user}`)
 
-    console.log('\n\n')
+    console.log('.')
+    console.log('.')
 
     return
   }
@@ -536,7 +539,8 @@ async function handleActivityV2(
     try {
       await handleActivityV2OldActivity(oldPresence, user, guild)
     } catch (error) {
-      console.log('\n\n')
+      console.log('.')
+      console.log('.')
 
       console.log(
         `[${discordUser.username}, ${guild.name}] Error on handle old activity: ${error}`
@@ -552,7 +556,8 @@ async function handleActivityV2(
 
       console.log(`[${discordUser.username}, ${guild.name}] user: ${user}`)
 
-      console.log('\n\n')
+      console.log('.')
+      console.log('.')
 
       return
     }
@@ -560,7 +565,7 @@ async function handleActivityV2(
   try {
     await handleActivityV2NewActivity(newPresence, user, guild)
   } catch (error) {
-    console.log('\n\n')
+    console.log('.')
 
     console.log(
       `[${discordUser.username}, ${guild.name}] Error on handle new activity: ${error}`
@@ -576,7 +581,7 @@ async function handleActivityV2(
 
     console.log(`[${discordUser.username}, ${guild.name}] user: ${user}`)
 
-    console.log('\n\n')
+    console.log('.')
 
     return
   }
