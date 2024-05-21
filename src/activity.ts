@@ -153,7 +153,7 @@ async function handleActivity(
         type: typeText,
         name: activity.name,
 
-        startedAt: activity.timestamps?.start,
+        startedAt: activity.timestamps?.start || now,
       },
     })
 
@@ -194,7 +194,7 @@ async function handleActivity(
           type: typeText,
           name: activity.name,
 
-          startedAt: activity.timestamps?.start,
+          startedAt: activity.timestamps?.start || now,
         },
       })
 
