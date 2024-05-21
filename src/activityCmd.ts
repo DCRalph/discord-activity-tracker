@@ -77,7 +77,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ).map(([name, duration]) => {
     return {
       name,
-      value: `${prettySeconds(duration)} seconds`,
+      value: prettySeconds(duration),
       inline: true,
     }
   })
@@ -87,7 +87,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ).map(([name, duration]) => {
     return {
       name,
-      value: `${prettySeconds(duration)} seconds`,
+      value: prettySeconds(duration),
       inline: true,
     }
   })
