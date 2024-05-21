@@ -56,6 +56,8 @@ async function handleActivity(
 
   const now = new Date()
 
+  console.log('\n\n')
+
   // ########## online status ##########
 
   const oldStatus = oldPresence?.status || 'offline'
@@ -138,12 +140,67 @@ async function handleActivity(
 
   console.log(`[${discordUser.username}] Checking activities...`)
 
+  if (oldPresence !== null) {
+    for (const activity of oldPresence.activities) {
+      if (activity.type != 0) continue
+      const typeText = activityTypeMap[activity.type] || 'unknown'
+      // console.log(activity)
+      const activityRecord = await prisma.activity.findFirst({
+        where: {
+          userId: user.id,
+          activityType: 'activity',
+
+          type: typeText,
+          name: activity.name,
+
+          startedAt: activity.timestamps?.start || now,
+        },
+      })
+
+      const endedAt = activity.timestamps?.end || now
+      const startedAt = activity.timestamps?.start || now
+
+      if (activityRecord) {
+        console.log(
+          `[${discordUser.username}] Updating activity record for old activity`
+        )
+        await prisma.activity.update({
+          where: {
+            id: activityRecord.id,
+            activityType: 'activity',
+          },
+          data: {
+            endedAt: endedAt,
+            duration: (endedAt.getTime() - startedAt.getTime()) / 1000,
+          },
+        })
+      } else {
+        console.log(
+          `[${discordUser.username}] Creating activity record for old activity ${activity.name}`
+        )
+        await prisma.activity.create({
+          data: {
+            userId: user.id,
+            activityType: 'activity',
+
+            type: typeText,
+            name: activity.name,
+            details: activity.details,
+
+            startedAt: activity.timestamps?.start || now,
+            endedAt: endedAt,
+            duration:
+              (endedAt.getTime() - activity.timestamps?.start.getTime()) / 1000,
+          },
+        })
+      }
+    }
+  }
+
   for (const activity of newPresence.activities) {
-    if (activity.type == 4) continue
+    if (activity.type != 0) continue
 
     const typeText = activityTypeMap[activity.type] || 'unknown'
-
-    console.log(activity)
 
     const existingActivity = await prisma.activity.findFirst({
       where: {
@@ -179,64 +236,6 @@ async function handleActivity(
         startedAt: activity.timestamps?.start || now,
       },
     })
-  }
-
-  if (oldPresence !== null) {
-    for (const activity of oldPresence.activities) {
-      if (activity.type == 4) continue
-      const typeText = activityTypeMap[activity.type] || 'unknown'
-      // console.log(activity)
-      const activityRecord = await prisma.activity.findFirst({
-        where: {
-          userId: user.id,
-          activityType: 'activity',
-
-          type: typeText,
-          name: activity.name,
-
-          startedAt: activity.timestamps?.start || now,
-        },
-      })
-
-      const endedAt = activity.timestamps?.end || now
-      const startedAt = activity.timestamps?.start || now
-
-      if (activityRecord) {
-        console.log(
-          `[${discordUser.username}] Updating activity record for old activity`
-        )
-        await prisma.activity.update({
-          where: {
-            id: activityRecord.id,
-            activityType: 'activity',
-          },
-          data: {
-            endedAt: endedAt,
-            duration:
-              (endedAt.getTime() - startedAt.getTime()) / 1000,
-          },
-        })
-      } else {
-        console.log(
-          `[${discordUser.username}] Creating activity record for old activity ${activity.name}`
-        )
-        await prisma.activity.create({
-          data: {
-            userId: user.id,
-            activityType: 'activity',
-
-            type: typeText,
-            name: activity.name,
-            details: activity.details,
-
-            startedAt: activity.timestamps?.start || now,
-            endedAt: endedAt,
-            duration:
-              (endedAt.getTime() - activity.timestamps?.start.getTime()) / 1000,
-          },
-        })
-      }
-    }
   }
 
   usersProsessing.delete(discordUser.id)

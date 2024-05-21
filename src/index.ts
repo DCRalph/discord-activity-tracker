@@ -31,26 +31,27 @@ client.once('ready', async () => {
 
   client.user?.setActivity(botActivity)
 
-  const g = await client.guilds.fetch("689384013047005199")
+  const g = await client.guilds.fetch('689384013047005199')
   const c = await g.commands.fetch()
 
-  client.guilds.cache.forEach((guild) => {
-    guild.commands.cache.forEach((command) => {
-      command.delete()
-    })
+  console.log(c)
 
-    guild.commands.create({
-      name: 'activity',
-      description: 'Get the activity of a user',
-      options: [
-        {
-          name: 'user',
-          type: Discord.ApplicationCommandOptionType.User,
-          description: 'The user you want to get the activity of',
-          required: true,
-        },
-      ],
-    })
+  c.forEach(async (command) => {
+    console.log(command)
+    await command.delete()
+  })
+
+  g.commands.create({
+    name: 'activity',
+    description: 'Get user activity',
+    options: [
+      {
+        name: 'user',
+        type: Discord.ApplicationCommandOptionType.User,
+        description: 'The user to get activity for',
+        required: true,
+      },
+    ],
   })
 })
 
@@ -59,7 +60,29 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
 
   if (newPresence.user?.bot) return
 
-  handleActivity(oldPresence, newPresence)
+  try {
+    handleActivity(oldPresence, newPresence)
+  } catch (e) {
+    console.log('\n\nError')
+    console.error(e)
+    console.log('\n')
+
+    if (oldPresence) {
+      console.log('Old presence:')
+      console.log(oldPresence)
+
+      console.log('oldPresence activities:')
+      console.log(oldPresence.activities)
+    }
+
+    console.log('New presence:')
+    console.log(newPresence)
+
+    console.log('newPresence activities:')
+    console.log(newPresence.activities)
+
+    console.log('\n\n')
+  }
 })
 
 client.on('interactionCreate', async (interaction) => {
