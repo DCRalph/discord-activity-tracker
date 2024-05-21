@@ -3,6 +3,7 @@ import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
 import { handleActivity, handleActivityV2 } from './activity'
+import { handleActivityCmd } from './activityCmd'
 
 dotenv.config()
 
@@ -119,49 +120,17 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'activity') {
     const user = interaction.options.get('user', true)?.user
 
-    const userRecord = await prisma.user.findFirst({
-      where: {
-        discordId: user.id,
-      },
-    })
-
-    if (!userRecord) {
-      interaction.reply('User not found')
+    if (!user) {
+      interaction.reply('User required')
       return
     }
 
-    const activityRecord = await prisma.activity.findMany({
-      where: {
-        userId: userRecord.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    let totals = {}
-
-    for (const activity of activityRecord) {
-      if (activity.activityType !== 'activity') continue
-
-      let duration = 0
-
-      if (!totals[activity.name]) totals[activity.name] = 0
-
-      if (activity.endedAt == null)
-        duration = (new Date().getTime() - activity.startedAt.getTime()) / 1000
-      else duration = activity.duration
-
-      totals[activity.name] += duration
+    if (user.bot) {
+      interaction.reply('Bot users are not supported')
+      return
     }
 
-    let msg = `Activity for ${user.username}:\n`
-
-    for (const [name, duration] of Object.entries(totals)) {
-      msg += `${name}: ${duration}\n`
-    }
-
-    interaction.reply(msg)
+    handleActivityCmd(interaction)
   }
 })
 
