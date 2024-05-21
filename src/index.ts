@@ -35,6 +35,13 @@ client.once('ready', async () => {
 
   console.log(guilds)
 
+  let commands = await client.application.commands.fetch()
+  console.log(`global commands: ${commands.size}`)
+
+  commands.forEach(async (command) => {
+    await command.delete()
+  })
+
   for (const guild of guilds) {
     const g = await client.guilds.fetch(guild.id)
     const c = await g.commands.fetch()
@@ -44,27 +51,27 @@ client.once('ready', async () => {
     c.forEach(async (command) => {
       await command.delete()
     })
+
+    g.commands.create({
+      name: 'ping',
+      description: 'Ping the bot',
+    })
+
+    g.commands.create({
+      name: 'activity',
+      description: 'Get user activity',
+      options: [
+        {
+          name: 'user',
+          type: Discord.ApplicationCommandOptionType.User,
+          description: 'The user to get activity for',
+          required: true,
+        },
+      ],
+    })
+
+    console.log(`commands created for ${guild.name}`)
   }
-
-  let commands = await client.application.commands.fetch()
-  console.log(`global commands: ${commands.size}`)
-
-  commands.forEach(async (command) => {
-    await command.delete()
-  })
-
-  // client.application.commands.create({
-  //   name: 'activity',
-  //   description: 'Get user activity',
-  //   options: [
-  //     {
-  //       name: 'user',
-  //       type: Discord.ApplicationCommandOptionType.User,
-  //       description: 'The user to get activity for',
-  //       required: true,
-  //     },
-  //   ],
-  // })
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
@@ -79,6 +86,10 @@ client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return
 
   const { commandName } = interaction
+
+  if (commandName === 'ping') {
+    interaction.reply('Pong!')
+  }
 
   if (commandName === 'activity') {
     const user = interaction.options.get('user', true)?.user
