@@ -143,7 +143,7 @@ async function handleActivity(
 
     const typeText = activityTypeMap[activity.type] || 'unknown'
 
-    // console.log(activity)
+    console.log(activity)
 
     const existingActivity = await prisma.activity.findFirst({
       where: {
