@@ -47,8 +47,9 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       activities: {
         where: {
           type: {
-            not: "offline"
-          }
+            not: 'offline',
+          },
+        },
       },
     },
   })
