@@ -76,33 +76,30 @@ client.once('ready', async () => {
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
-  // console.log('Presence update')
-
   if (newPresence.user?.bot) return
-
-  // const discordId = newPresence.user?.id
-  // const username = newPresence.user?.username
-  // const guildId = newPresence.guild?.id
-  // const guildName = newPresence.guild?.name
 
   const discordUser = newPresence.user
   const guild = newPresence.guild
 
   if (!discordUser.id) return
 
-  // make sure if user is in more than one guild, we only handle the first one
   const userAllowedGuild = userGuildMap.get(discordUser.id)
 
   if (!userAllowedGuild) {
     userGuildMap.set(discordUser.id, guild.id)
   } else if (userAllowedGuild !== guild.id) {
-    console.log(`User ${discordUser.username} is in multiple guilds, skipping ${guild.name}...`)
+    console.log(
+      `User ${discordUser.username} is in multiple guilds, skipping ${guild.name}...`
+    )
     return
   }
 
   console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
   await handleActivityV2(oldPresence, newPresence, guild)
+
+  console.log(`[${discordUser.username}, ${guild.name}] Done`)
+  console.log('\n\n\n')
 })
 
 client.on('interactionCreate', async (interaction) => {
