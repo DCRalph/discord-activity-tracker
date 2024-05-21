@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
-import { handleActivity } from './activity'
+import { handleActivity, handleActivityV2 } from './activity'
 
 dotenv.config()
 
@@ -41,6 +41,14 @@ client.once('ready', async () => {
     await command.delete()
   })
 
+  let commands = await client.application.commands.fetch()
+
+  console.log(commands)
+  commands.forEach(async (command) => {
+    console.log(command)
+    await command.delete()
+  })
+
   g.commands.create({
     name: 'activity',
     description: 'Get user activity',
@@ -55,34 +63,12 @@ client.once('ready', async () => {
   })
 })
 
-client.on('presenceUpdate', (oldPresence, newPresence) => {
+client.on('presenceUpdate', async (oldPresence, newPresence) => {
   // console.log('Presence update')
 
   if (newPresence.user?.bot) return
 
-  try {
-    handleActivity(oldPresence, newPresence)
-  } catch (e) {
-    console.log('\n\nError')
-    console.error(e)
-    console.log('\n')
-
-    if (oldPresence) {
-      console.log('Old presence:')
-      console.log(oldPresence)
-
-      console.log('oldPresence activities:')
-      console.log(oldPresence.activities)
-    }
-
-    console.log('New presence:')
-    console.log(newPresence)
-
-    console.log('newPresence activities:')
-    console.log(newPresence.activities)
-
-    console.log('\n\n')
-  }
+  await handleActivityV2(oldPresence, newPresence)
 })
 
 client.on('interactionCreate', async (interaction) => {
