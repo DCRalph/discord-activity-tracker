@@ -54,12 +54,12 @@ client.once('ready', async () => {
       await command.delete()
     })
 
-    g.commands.create({
+    await g.commands.create({
       name: 'ping',
       description: 'Ping the bot',
     })
 
-    g.commands.create({
+    await g.commands.create({
       name: 'activity',
       description: 'Get user activity',
       options: [
@@ -72,7 +72,7 @@ client.once('ready', async () => {
       ],
     })
 
-    g.commands.create({
+    await g.commands.create({
       name: 'activity-leaderboard',
       description: 'Get user activity leaderboard',
     })
