@@ -272,15 +272,16 @@ async function handleActivityV2Status(
       },
     })
 
-    if (lastStatusRecord?.endedAt != null) {
-      console.log(
-        `[${user.username}, ${guild.name}] Last status record is already ended. Skipping...`
-      )
-      return
-    }
-
     if (lastStatusRecord) {
       // update the last status record
+
+      if (lastStatusRecord?.endedAt != null) {
+        console.log(
+          `[${user.username}, ${guild.name}] Last status record is already ended. Skipping...`
+        )
+        return
+      }
+
       console.log(
         `[${user.username}, ${guild.name}] Updateing last status record`
       )
@@ -499,10 +500,16 @@ async function handleActivityV2(
   } catch (error) {
     console.log('\n\n')
 
-    console.log(`[${discordUser.username}, ${guild.name}] Error on handle status: ${error}`)
+    console.log(
+      `[${discordUser.username}, ${guild.name}] Error on handle status: ${error}`
+    )
 
-    console.log(`[${discordUser.username}, ${guild.name}] oldStatus: ${oldStatus}`)
-    console.log(`[${discordUser.username}, ${guild.name}] newStatus: ${newStatus}`)
+    console.log(
+      `[${discordUser.username}, ${guild.name}] oldStatus: ${oldStatus}`
+    )
+    console.log(
+      `[${discordUser.username}, ${guild.name}] newStatus: ${newStatus}`
+    )
 
     console.log(`[${discordUser.username}, ${guild.name}] user: ${user}`)
 
@@ -525,8 +532,12 @@ async function handleActivityV2(
         `[${discordUser.username}, ${guild.name}] Error on handle old activity: ${error}`
       )
 
-      console.log(`[${discordUser.username}, ${guild.name}] oldPresence: ${oldPresence}`)
-      console.log(`[${discordUser.username}, ${guild.name}] oldPresence activities:`)
+      console.log(
+        `[${discordUser.username}, ${guild.name}] oldPresence: ${oldPresence}`
+      )
+      console.log(
+        `[${discordUser.username}, ${guild.name}] oldPresence activities:`
+      )
       console.log(oldPresence.activities)
 
       console.log(`[${discordUser.username}, ${guild.name}] user: ${user}`)
@@ -545,8 +556,12 @@ async function handleActivityV2(
       `[${discordUser.username}, ${guild.name}] Error on handle new activity: ${error}`
     )
 
-    console.log(`[${discordUser.username}, ${guild.name}] newPresence: ${newPresence}`)
-    console.log(`[${discordUser.username}, ${guild.name}] newPresence activities:`)
+    console.log(
+      `[${discordUser.username}, ${guild.name}] newPresence: ${newPresence}`
+    )
+    console.log(
+      `[${discordUser.username}, ${guild.name}] newPresence activities:`
+    )
     console.log(newPresence.activities)
 
     console.log(`[${discordUser.username}, ${guild.name}] user: ${user}`)

@@ -96,7 +96,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   if (!userAllowedGuild) {
     userGuildMap.set(discordUser.id, guild.id)
   } else if (userAllowedGuild !== guild.id) {
-    console.log(`User ${discordUser.username} is in multiple guilds, skipping`)
+    console.log(`User ${discordUser.username} is in multiple guilds, skipping ${guild.name}...`)
     return
   }
 
