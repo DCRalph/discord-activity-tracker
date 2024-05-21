@@ -150,14 +150,14 @@ async function handleActivityLeaderboardCmd(
       }
     }
 
-    userTotals[user.discordId] = total
+    userTotals[user.username] = total
   }
 
   const sortedUsers = Object.entries(userTotals)
     .sort((a, b) => b[1] - a[1])
-    .map(([discordId, duration]) => {
+    .map(([username, duration]) => {
       return {
-        discordId,
+        username,
         duration,
       }
     })
@@ -168,11 +168,9 @@ async function handleActivityLeaderboardCmd(
     .setTimestamp(now)
 
   const fields: Discord.APIEmbedField[] = sortedUsers.map(
-    ({ discordId, duration }, index) => {
-      const discordUser = interaction.guild?.members.cache.get(discordId)?.user
-
+    ({ username, duration }, index) => {
       return {
-        name: `${index + 1}. ${discordUser?.username || discordId}`,
+        name: `${index + 1}. ${username}`,
         value: prettySeconds(duration),
         inline: false,
       }
