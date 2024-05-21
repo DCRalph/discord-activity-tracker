@@ -12,10 +12,10 @@ function prettySeconds(seconds: number) {
   seconds %= 60
 
   let result = ''
-  if (days) result += `${days} days `
-  if (hours) result += `${hours} hours `
-  if (minutes) result += `${minutes} minutes `
-  if (seconds) result += `${seconds} seconds `
+  if (days) result += `${days} d `
+  if (hours) result += `${hours} h `
+  if (minutes) result += `${minutes} m `
+  if (seconds) result += `${seconds} s `
 
   return result.trim()
 }
@@ -124,4 +124,60 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   interaction.reply({ embeds: [embed] })
 }
 
-export { handleActivityCmd }
+async function handleActivityLeaderboardCmd(
+  interaction: Discord.CommandInteraction
+) {
+  const users = await prisma.user.findMany({
+    include: {
+      activities: true,
+    },
+  })
+
+  const now = new Date()
+  let userTotals: Record<string, number> = {}
+
+  for (const user of users) {
+    const activities = user.activities
+
+    let total = 0
+    for (const activity of activities) {
+      if (activity.activityType == 'activity') {
+        total += activity.duration || 0
+      }
+    }
+
+    userTotals[user.discordId] = total
+  }
+
+  const sortedUsers = Object.entries(userTotals)
+    .sort((a, b) => b[1] - a[1])
+    .map(([discordId, duration]) => {
+      return {
+        discordId,
+        duration,
+      }
+    })
+
+  const embed = new Discord.EmbedBuilder()
+    .setTitle('Activity Leaderboard')
+    .setColor('Random')
+    .setTimestamp(now)
+
+  const fields: Discord.APIEmbedField[] = sortedUsers.map(
+    ({ discordId, duration }, index) => {
+      const discordUser = interaction.guild?.members.cache.get(discordId)?.user
+
+      return {
+        name: `${index + 1}. ${discordUser?.username || discordId}`,
+        value: prettySeconds(duration),
+        inline: false,
+      }
+    }
+  )
+
+  embed.addFields(fields)
+
+  interaction.reply({ embeds: [embed] })
+}
+
+export { handleActivityCmd, handleActivityLeaderboardCmd }

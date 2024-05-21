@@ -3,7 +3,7 @@ import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
 import { handleActivityV2 } from './activity'
-import { handleActivityCmd } from './activityCmd'
+import { handleActivityCmd, handleActivityLeaderboardCmd } from './activityCmd'
 
 dotenv.config()
 
@@ -72,6 +72,11 @@ client.once('ready', async () => {
       ],
     })
 
+    g.commands.create({
+      name: 'activity-leaderboard',
+      description: 'Get user activity leaderboard',
+    })
+
     console.log(`Commands created for ${guild.name}`)
   }
 
@@ -125,6 +130,10 @@ client.on('interactionCreate', async (interaction) => {
 
   if (commandName === 'activity') {
     handleActivityCmd(interaction)
+  }
+
+  if (commandName === 'activity-leaderboard') {
+    handleActivityLeaderboardCmd(interaction)
   }
 })
 
