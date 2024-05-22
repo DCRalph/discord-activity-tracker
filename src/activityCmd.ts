@@ -152,18 +152,33 @@ async function handleActivityLeaderboardCmd(
     .setColor('Random')
     .setTimestamp(now)
 
-  const fields: Discord.APIEmbedField[] = sortedUsers.map(
-    ({ username, duration }, index) => {
-      return {
-        name: `${index + 1}. ${username}`,
-        value: prettySeconds(duration),
-        inline: false,
-      }
-    }
-  )
+    let indexCol = ""
+    let usernameCol = ""
+    let durationCol = ""
 
-  // console.log(fields)
-  embed.addFields(fields)
+    for (let i = 0; i < sortedUsers.length; i++) {
+      indexCol += `${i + 1}\n`
+      usernameCol += `${sortedUsers[i].username}\n`
+      durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
+    }
+
+    embed.addFields([
+      {
+        name: 'Rank',
+        value: indexCol,
+        inline: true
+      },
+      {
+        name: 'Username',
+        value: usernameCol,
+        inline: true
+      },
+      {
+        name: 'Duration',
+        value: durationCol,
+        inline: true
+      }
+    ])
 
   interaction.reply({ embeds: [embed] })
 }
