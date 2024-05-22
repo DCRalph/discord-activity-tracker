@@ -51,9 +51,19 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     },
   })
 
-  activitys = activitys.filter((activity) => {
-    return activity.name.toLowerCase().startsWith(game.toLowerCase())
-  })
+  if (
+    activitys.find(
+      (activity) => activity.name.toLowerCase() == game.toLowerCase()
+    )
+  ) {
+    activitys = activitys.filter((activity) => {
+      return activity.name == game
+    })
+  } else {
+    activitys = activitys.filter((activity) => {
+      return activity.name.toLowerCase().startsWith(game.toLowerCase())
+    })
+  }
 
   console.log(activitys)
 
