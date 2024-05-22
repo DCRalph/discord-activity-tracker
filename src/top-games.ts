@@ -1,5 +1,6 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
+import { prettySeconds } from './prettySeconds'
 
 const prisma = new PrismaClient()
 
@@ -63,8 +64,8 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
   // create embed
 
   const embed = new Discord.EmbedBuilder()
-    .setTitle('Top Games')
-    .setColor('#0099ff')
+    .setTitle('Top 10 Games')
+    .setColor('Random')
 
   let i = 0
   for (const [game, duration] of gameTotalsArray) {
@@ -76,7 +77,7 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
 
     embed.addFields({
       name: game,
-      value: `${duration} minutes\n${user}`,
+      value: `${prettySeconds(duration)}\n${user}`,
       inline: false,
     })
 
