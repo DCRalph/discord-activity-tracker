@@ -70,6 +70,8 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     return
   }
 
+  const fullGameName = activitys[0].name
+
   let userTotals: Record<string, number> = {}
 
   for (const activity of activitys) {
@@ -90,7 +92,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   }
 
   const embed = new Discord.EmbedBuilder()
-  embed.setTitle(`Top users for ${game}`)
+  embed.setTitle(`Top users for ${fullGameName}`)
   embed.setColor('Random')
 
   let i = 1
