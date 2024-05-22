@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 
 import { handleActivityV2 } from './activity'
 import { handleActivityCmd, handleActivityLeaderboardCmd } from './activityCmd'
+import { handleTopGames } from './top-games'
 
 dotenv.config()
 
@@ -77,6 +78,11 @@ client.once('ready', async () => {
       description: 'Get user activity leaderboard',
     })
 
+    await g.commands.create({
+      name: 'top-games',
+      description: 'Get list of top games',
+    })
+
     console.log(`Commands created for ${guild.name}`)
   }
 
@@ -134,6 +140,10 @@ client.on('interactionCreate', async (interaction) => {
 
   if (commandName === 'activity-leaderboard') {
     handleActivityLeaderboardCmd(interaction)
+  }
+
+  if (commandName === 'top-games') {
+    handleTopGames(interaction)
   }
 })
 
