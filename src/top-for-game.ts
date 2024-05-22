@@ -75,7 +75,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   userTotalsArray.sort((a, b) => b[1] - a[1])
 
   let userTotalsMap = new Map<string, number>()
-  
+
   for (const [username, duration] of userTotalsArray) {
     userTotalsMap.set(username, duration)
   }
@@ -86,7 +86,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
 
   let i = 1
   for (const [username, duration] of userTotalsMap) {
-    if (i++ > 10) {
+    if (i > 10) {
       break
     }
 
@@ -95,7 +95,6 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
       value: prettySeconds(duration),
       inline: false,
     })
-
     i++
   }
 
