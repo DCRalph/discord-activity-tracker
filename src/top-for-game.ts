@@ -42,14 +42,17 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     return
   }
 
-  const activitys = await prisma.activity.findMany({
+  let activitys = await prisma.activity.findMany({
     where: {
       activityType: 'activity',
-      name: game,
     },
     include: {
       user: true,
     },
+  })
+
+  activitys = activitys.filter((activity) => {
+    return activity.name.toLowerCase().startsWith(game.toLowerCase())
   })
 
   console.log(activitys)
