@@ -53,6 +53,8 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     },
   })
 
+  console.log(users)
+
   if (!users.length) {
     interaction.reply('No users found for game')
 
