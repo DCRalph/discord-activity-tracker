@@ -55,7 +55,14 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   console.log(activitys)
 
   if (!activitys.length) {
-    interaction.reply('No users found for game')
+    const games = await getUniqueGames()
+
+    let msg = 'No users found for game'
+    if (games.size) {
+      msg += ', valid games are: ' + [...games].join(', ')
+    }
+
+    interaction.reply(msg)
 
     return
   }
