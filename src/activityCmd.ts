@@ -149,6 +149,7 @@ async function handleActivityLeaderboardCmd(
 
   const embed = new Discord.EmbedBuilder()
     .setTitle('Activity Leaderboard')
+    .setDescription('Rank users by total time spent playing games')
     .setColor('Random')
     .setTimestamp(now)
 
