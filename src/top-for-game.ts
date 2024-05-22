@@ -42,20 +42,19 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     return
   }
 
-  const users = await prisma.user.findMany({
+  const activitys = await prisma.activity.findMany({
+    where: {
+      activityType: 'activity',
+      name: game,
+    },
     include: {
-      activities: {
-        where: {
-          activityType: 'activity',
-          name: game,
-        },
-      },
+      user: true,
     },
   })
 
-  console.log(users)
+  console.log(activitys)
 
-  if (!users.length) {
+  if (!activitys.length) {
     interaction.reply('No users found for game')
 
     return
@@ -63,13 +62,11 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
 
   let userTotals: Record<string, number> = {}
 
-  for (const user of users) {
-    for (const activity of user.activities) {
-      if (userTotals[user.username]) {
-        userTotals[user.username] += activity.duration
-      } else {
-        userTotals[user.username] = activity.duration
-      }
+  for (const activity of activitys) {
+    if (userTotals[activity.user.username]) {
+      userTotals[activity.user.username] += activity.duration
+    } else {
+      userTotals[activity.user.username] = activity.duration
     }
   }
 
