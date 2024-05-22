@@ -92,7 +92,7 @@ client.once('ready', async () => {
           name: 'game',
           type: Discord.ApplicationCommandOptionType.String,
           description: 'The game to get top users for',
-          required: true,
+          required: false,
         },
       ],
     })

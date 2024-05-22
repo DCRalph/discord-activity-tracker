@@ -27,14 +27,14 @@ async function getUniqueGames() {
 }
 
 async function handleTopForGame(interaction: Discord.CommandInteraction) {
-  const game = interaction.options.get('game', true)?.value as string
+  const game = interaction.options.get('game', alse)?.value as string
 
   if (!game) {
     const games = await getUniqueGames()
 
-    let msg = 'Game required'
+    let msg = 'No game provided, valid games are:\n'
     if (games.size) {
-      msg += ', valid games are: ' + [...games].join(', ')
+      msg += [...games].join('\n')
     }
 
     interaction.reply(msg)
