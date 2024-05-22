@@ -67,16 +67,16 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
     .setTitle('Top 10 Games')
     .setColor('Random')
 
-  let i = 0
+  let i = 1
   for (const [game, duration] of gameTotalsArray) {
-    if (i >= 10) {
+    if (i > 10) {
       break
     }
 
     let user = userTotalsMap.get(game)
 
     embed.addFields({
-      name: game,
+      name: `${i}. ${game}`,
       value: `${prettySeconds(duration)}\n${user}`,
       inline: false,
     })

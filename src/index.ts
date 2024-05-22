@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client'
 import { handleActivityV2 } from './activity'
 import { handleActivityCmd, handleActivityLeaderboardCmd } from './activityCmd'
 import { handleTopGames } from './top-games'
+import { handleTopForGame } from './top-for-game'
 
 dotenv.config()
 
@@ -83,6 +84,19 @@ client.once('ready', async () => {
       description: 'Get list of top games',
     })
 
+    await g.commands.create({
+      name: 'top-for-game',
+      description: 'Get top users for a game',
+      options: [
+        {
+          name: 'game',
+          type: Discord.ApplicationCommandOptionType.String,
+          description: 'The game to get top users for',
+          required: true,
+        },
+      ],
+    })
+
     console.log(`Commands created for ${guild.name}`)
   }
 
@@ -144,6 +158,10 @@ client.on('interactionCreate', async (interaction) => {
 
   if (commandName === 'top-games') {
     handleTopGames(interaction)
+  }
+
+  if (commandName === 'top-for-game') {
+    handleTopForGame(interaction)
   }
 })
 
