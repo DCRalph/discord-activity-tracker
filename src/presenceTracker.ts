@@ -112,13 +112,15 @@ async function handlePresence(
     username: discordUser.username,
     guildId: guild.id,
     guildName: guild.name,
-    oldStatus,
+    oldStatus: null,
     newStatus,
     oldActivities: [],
     newActivities: [],
   }
 
   if (oldPresence) {
+    presenceObj.oldStatus = oldPresence.status
+
     presenceObj.oldActivities = oldPresence.activities.map((activity) => {
       let obj = {
         type: activityTypeMap[activity.type],
