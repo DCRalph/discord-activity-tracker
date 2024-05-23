@@ -178,7 +178,7 @@ client.on('interactionCreate', async (interaction) => {
   }
 
   if (commandName === 'admin-recreate-cmds') {
-    if (interaction.user.id != coolGuy && true) {
+    if (interaction.user.id != coolGuy || true) {
       //https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4
       // send this video as a reply
 
