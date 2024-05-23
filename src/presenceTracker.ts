@@ -128,9 +128,14 @@ async function handlePresence(
         details: activity.details,
         state: activity.state,
         timestamps: {
-          start: activity.timestamps?.start ?? null,
-          end: activity.timestamps?.end ?? null,
+          start: null,
+          end: null,
         },
+      }
+
+      if (activity.timestamps) {
+        obj.timestamps.start = activity.timestamps.start ?? null
+        obj.timestamps.end = activity.timestamps.end ?? null
       }
 
       return obj
@@ -144,9 +149,14 @@ async function handlePresence(
       details: activity.details,
       state: activity.state,
       timestamps: {
-        start: activity.timestamps?.start ?? null,
-        end: activity.timestamps?.end ?? null,
+        start: null,
+        end: null,
       },
+    }
+
+    if (activity.timestamps) {
+      obj.timestamps.start = activity.timestamps.start ?? null
+      obj.timestamps.end = activity.timestamps.end ?? null
     }
 
     return obj
