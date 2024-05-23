@@ -6,6 +6,7 @@ import { handleActivityV2 } from './activity'
 import { handleActivityCmd, handleActivityLeaderboardCmd } from './activityCmd'
 import { handleTopGames } from './top-games'
 import { handleTopForGame } from './top-for-game'
+import { handlePresence } from './presenceTracker'
 
 dotenv.config()
 
@@ -164,6 +165,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
   await handleActivityV2(oldPresence, newPresence, guild)
+  await handlePresence(oldPresence, newPresence, guild)
 
   console.log(`[${discordUser.username}, ${guild.name}] Done`)
   console.log('.')
