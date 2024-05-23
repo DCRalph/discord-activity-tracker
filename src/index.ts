@@ -184,15 +184,15 @@ client.on('interactionCreate', async (interaction) => {
 
       const embed = new Discord.EmbedBuilder()
         .setTitle('Nope')
+        .setColor('Red')
         .setDescription('You are not allowed to do that')
-        .setImage(
-          'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4'
-        )
-        .setURL(
-          'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4'
-        )
 
-      interaction.reply({ embeds: [embed] })
+      interaction.reply({
+        embeds: [embed],
+        files: [
+          'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4',
+        ],
+      })
     } else {
       await deleteCmds()
       await createCmds()
