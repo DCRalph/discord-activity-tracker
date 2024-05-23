@@ -87,9 +87,6 @@ async function preProcessPresence(presence: Presence) {
   if (presence.oldStatus !== presence.newStatus) {
     WhatToDo.status = true
   }
-
-
-
 }
 
 async function handlePresence(
@@ -129,8 +126,8 @@ async function handlePresence(
         details: activity.details,
         state: activity.state,
         timestamps: {
-          start: activity.timestamps?.start,
-          end: activity.timestamps?.end,
+          start: activity.timestamps?.start ?? null,
+          end: activity.timestamps?.end ?? null,
         },
       }
 
@@ -145,8 +142,8 @@ async function handlePresence(
       details: activity.details,
       state: activity.state,
       timestamps: {
-        start: activity.timestamps?.start,
-        end: activity.timestamps?.end,
+        start: activity.timestamps?.start ?? null,
+        end: activity.timestamps?.end ?? null,
       },
     }
 
