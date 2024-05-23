@@ -139,17 +139,6 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   const discordUser = newPresence.user
   const guild = newPresence.guild
 
-  if (!discordUser.id) return
-
-  if (usersProcessing.has(discordUser.id)) {
-    console.log(
-      `[${discordUser.username}, ${guild.name}] Already processing...`
-    )
-    return
-  }
-
-  usersProcessing.add(discordUser.id)
-
   const userAllowedGuild = userGuildMap.get(discordUser.id)
 
   if (!userAllowedGuild) {
@@ -160,6 +149,17 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
     )
     return
   }
+
+  if (!discordUser.id) return
+
+  if (usersProcessing.has(discordUser.id)) {
+    console.log(
+      `[${discordUser.username}, ${guild.name}] Already processing...`
+    )
+    return
+  }
+
+  usersProcessing.add(discordUser.id)
 
   console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
