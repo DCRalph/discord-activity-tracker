@@ -1,6 +1,7 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 import { prettySeconds } from './prettySeconds'
+import { blacklistedGames } from './blacklist'
 
 const prisma = new PrismaClient()
 
@@ -21,6 +22,8 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
 
   for (const user of users) {
     for (const activity of user.activities) {
+      if (blacklistedGames.includes(activity.name)) continue
+
       if (gameTotals[activity.name]) {
         gameTotals[activity.name] += activity.duration
       } else {

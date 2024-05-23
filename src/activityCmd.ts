@@ -2,6 +2,7 @@ import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 
 import { prettySeconds } from './prettySeconds'
+import { blacklistedGames } from './blacklist'
 
 const prisma = new PrismaClient()
 
@@ -118,7 +119,7 @@ async function handleActivityLeaderboardCmd(
 ) {
   const users = await prisma.user.findMany({
     include: {
-      activities: true,
+      activities: { where: { type: 'activity' } },
     },
   })
 
@@ -130,9 +131,9 @@ async function handleActivityLeaderboardCmd(
 
     let total = 0
     for (const activity of activities) {
-      if (activity.activityType == 'activity') {
-        total += activity.duration || 0
-      }
+      if (blacklistedGames.includes(activity.name)) continue
+
+      total += activity.duration || 0
     }
 
     userTotals[user.username] = total
@@ -153,33 +154,33 @@ async function handleActivityLeaderboardCmd(
     .setColor('Random')
     .setTimestamp(now)
 
-    let indexCol = ""
-    let usernameCol = ""
-    let durationCol = ""
+  let indexCol = ''
+  let usernameCol = ''
+  let durationCol = ''
 
-    for (let i = 0; i < sortedUsers.length; i++) {
-      indexCol += `${i + 1}\n`
-      usernameCol += `${sortedUsers[i].username}\n`
-      durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
-    }
+  for (let i = 0; i < sortedUsers.length; i++) {
+    indexCol += `${i + 1}\n`
+    usernameCol += `${sortedUsers[i].username}\n`
+    durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
+  }
 
-    embed.addFields([
-      {
-        name: 'Rank',
-        value: indexCol,
-        inline: true
-      },
-      {
-        name: 'Username',
-        value: usernameCol,
-        inline: true
-      },
-      {
-        name: 'Duration',
-        value: durationCol,
-        inline: true
-      }
-    ])
+  embed.addFields([
+    {
+      name: 'Rank',
+      value: indexCol,
+      inline: true,
+    },
+    {
+      name: 'Username',
+      value: usernameCol,
+      inline: true,
+    },
+    {
+      name: 'Duration',
+      value: durationCol,
+      inline: true,
+    },
+  ])
 
   interaction.reply({ embeds: [embed] })
 }
