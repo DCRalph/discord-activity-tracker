@@ -7,7 +7,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "test": "tsx"
+    "install": "npm install",
+    "dbpush": "prisma db push",
+    "dbgenerate": "prisma generate"
   },
   "author": "me",
   "license": "ISC",
