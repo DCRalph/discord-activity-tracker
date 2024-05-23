@@ -110,10 +110,6 @@ async function createCmds() {
 
     console.log(`Commands created for ${guild.name}`)
   }
-
-  console.log('Bot is ready')
-  console.log('.')
-  console.log('.')
 }
 
 client.once('ready', async () => {
@@ -182,7 +178,7 @@ client.on('interactionCreate', async (interaction) => {
   }
 
   if (commandName === 'admin-recreate-cmds') {
-    if (interaction.user.id != coolGuy && false) {
+    if (interaction.user.id != coolGuy && true) {
       //https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4
       // send this video as a reply
 
