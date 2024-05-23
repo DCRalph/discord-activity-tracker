@@ -175,7 +175,7 @@ async function handleActivityV2OldActivity(
         `[${user.username}, ${guild.name}] Updating activity record for old activity (${activity.name})...`
       )
       console.log(
-        `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
+        `[${user.username}, ${guild.name}] Type: ${typeText} Details: ${activity.details}`
       )
 
       await prisma.activity.update({
@@ -194,7 +194,7 @@ async function handleActivityV2OldActivity(
         `[${user.username}, ${guild.name}] Creating activity record for old activity (${activity.name})...`
       )
       console.log(
-        `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
+        `[${user.username}, ${guild.name}] Type: ${typeText} Details: ${activity.details}`
       )
 
       await prisma.activity.create({
@@ -263,7 +263,7 @@ async function handleActivityV2NewActivity(
     )
 
     console.log(
-      `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
+      `[${user.username}, ${guild.name}] Type: ${typeText} Details: ${activity.details}`
     )
 
     if (lastActivityRecord) {
