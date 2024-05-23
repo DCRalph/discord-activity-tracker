@@ -23,8 +23,8 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
   let gameTotals: Record<string, number> = {}
 
   for (const user of users) {
-    for (const activity of user.activities) {
-      if (inBlacklist(activity.name)) continue
+    inner: for (const activity of user.activities) {
+      if (inBlacklist(activity.name)) continue inner
 
       const duration =
         activity.duration !== null
