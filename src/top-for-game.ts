@@ -90,9 +90,10 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   let userTotals: Record<string, number> = {}
 
   for (const activity of activities) {
-    let duration =
-      activity.duration ||
-      ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+    const duration =
+      activity.duration !== null
+        ? activity.duration
+        : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
     if (userTotals[activity.user.username]) {
       userTotals[activity.user.username] += duration

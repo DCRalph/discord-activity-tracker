@@ -42,8 +42,9 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   for (const activity of activities) {
     if (activity.activityType == 'activity') {
       const duration =
-        activity.duration ||
-        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+        activity.duration !== null
+          ? activity.duration
+          : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
       if (activityTotals[activity.name]) {
         activityTotals[activity.name] += duration
@@ -55,8 +56,9 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       activity.type != 'offline'
     ) {
       const duration =
-        activity.duration ||
-        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+        activity.duration !== null
+          ? activity.duration
+          : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
       if (statusTotals[activity.type]) {
         statusTotals[activity.type] += duration

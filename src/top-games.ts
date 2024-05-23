@@ -26,9 +26,10 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
     for (const activity of user.activities) {
       if (inBlacklist(activity.name)) continue
 
-      let duration =
-        activity.duration ||
-        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+      const duration =
+        activity.duration !== null
+          ? activity.duration
+          : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
       if (gameTotals[activity.name]) {
         gameTotals[activity.name] += activity.duration
