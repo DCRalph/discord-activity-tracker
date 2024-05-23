@@ -243,7 +243,7 @@ async function handleActivityV2NewActivity(
         type: typeText,
         name: activity.name,
 
-        startedAt: activity.timestamps.start
+        startedAt: activity.timestamps.start,
       },
     })
 
@@ -287,9 +287,6 @@ async function handleActivityV2(
   // if (discordUser.id != '472872051359612945') return // for testing
 
   const now = new Date()
-
-  console.log('.')
-  console.log('.')
 
   // ########## online status ##########
 

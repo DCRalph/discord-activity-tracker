@@ -1,7 +1,8 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 import { prettySeconds } from './prettySeconds'
-import { blacklistedGames } from './blacklist'
+import { inBlacklist } from './blacklist'
+
 
 const prisma = new PrismaClient()
 
@@ -20,7 +21,7 @@ async function getUniqueGames() {
 
   for (const user of users) {
     for (const activity of user.activities) {
-      if (blacklistedGames.includes(activity.name)) continue
+      if (inBlacklist(activity.name)) continue
 
       gameTotals.add(activity.name)
     }
@@ -32,7 +33,7 @@ async function getUniqueGames() {
 async function handleTopForGame(interaction: Discord.CommandInteraction) {
   const game = interaction.options.get('game', false)?.value as string
 
-  if (!game || blacklistedGames.includes(game)) {
+  if (!game || inBlacklist(game)) {
     const games = await getUniqueGames()
 
     let msg = 'No game provided, valid games are:\n'

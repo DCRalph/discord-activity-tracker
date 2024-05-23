@@ -21,6 +21,8 @@ const clientOptions = {
 }
 
 const client = new Discord.Client(clientOptions)
+let guilds = []
+const coolGuy = '472872051359612945'
 
 const prisma = new PrismaClient()
 
@@ -31,20 +33,16 @@ const botActivity: Discord.ActivityOptions = {
 
 let userGuildMap = new Map<string, string>()
 
-client.once('ready', async () => {
-  console.log(`Logged in as ${client.user?.tag}!`)
-
-  client.user?.setActivity(botActivity)
-
-  const guilds = [...client.guilds.cache.values()]
-
-  let commands = await client.application.commands.fetch()
+async function deleteCmds() {
+  const commands = await client.application.commands.fetch()
   console.log()
   console.log(`Global commands: ${commands.size}`)
 
   commands.forEach(async (command) => {
-    // await command.delete()
+    await command.delete()
   })
+
+  console.log('Global commands deleted')
 
   for (const guild of guilds) {
     const g = await client.guilds.fetch(guild.id)
@@ -53,12 +51,25 @@ client.once('ready', async () => {
     console.log(`Guild: ${guild.name}, Commands: ${c.size}`)
 
     c.forEach(async (command) => {
-      // await command.delete()
+      await command.delete()
     })
+  }
+
+  console.log('Guild commands deleted')
+}
+
+async function createCmds() {
+  for (const guild of guilds) {
+    const g = await client.guilds.fetch(guild.id)
 
     await g.commands.create({
       name: 'ping',
       description: 'Ping the bot',
+    })
+
+    await g.commands.create({
+      name: 'admin-recreate-cmds',
+      description: 'Recreate all commands',
     })
 
     await g.commands.create({
@@ -103,12 +114,26 @@ client.once('ready', async () => {
   console.log('Bot is ready')
   console.log('.')
   console.log('.')
+}
 
-  // client.users
-  //   .fetch('472872051359612945', { cache: false, force: true })
-  //   .then((user) => {
-  //     user.send('<@472872051359612945> Bot is ready!').catch(console.error)
-  //   })
+client.once('ready', async () => {
+  console.log(`Logged in as ${client.user?.tag}!`)
+
+  client.user?.setActivity(botActivity)
+
+  guilds = client.guilds.cache.map((guild) => {
+    return {
+      id: guild.id,
+      name: guild.name,
+    }
+  })
+
+  // await deleteCmds()
+  await createCmds()
+
+  console.log('Bot is ready')
+  console.log('.')
+  console.log('.')
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
@@ -145,7 +170,37 @@ client.on('interactionCreate', async (interaction) => {
   const { commandName } = interaction
 
   if (commandName === 'ping') {
-    interaction.reply('Pong!')
+    const timeTaken = Date.now() - interaction.createdTimestamp
+
+    const reply = await interaction.reply(
+      `Pong! to me(${timeTaken}ms) and back(...ms)`
+    )
+
+    const roundTripTime = Date.now() - reply.createdTimestamp
+
+    reply.edit(`Pong! toDiscord(${timeTaken}ms) and back(${roundTripTime}ms)`)
+  }
+
+  if (commandName === 'admin-recreate-cmds') {
+    if (interaction.user.id != coolGuy && false) {
+      //https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4
+      // send this video as a reply
+
+      const embed = new Discord.EmbedBuilder()
+        .setTitle('Nope')
+        .setDescription('You are not allowed to do that')
+        .setImage(
+          'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4'
+        )
+        .setURL(
+          'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4'
+        )
+
+      return
+    }
+
+    await deleteCmds()
+    await createCmds()
   }
 
   if (commandName === 'activity') {

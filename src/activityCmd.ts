@@ -2,7 +2,7 @@ import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 
 import { prettySeconds } from './prettySeconds'
-import { blacklistedGames } from './blacklist'
+import { inBlacklist } from './blacklist'
 
 const prisma = new PrismaClient()
 
@@ -131,7 +131,7 @@ async function handleActivityLeaderboardCmd(
 
     let total = 0
     for (const activity of activities) {
-      if (blacklistedGames.includes(activity.name)) continue
+      if (inBlacklist(activity.name)) continue
 
       total += activity.duration || 0
     }
