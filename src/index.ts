@@ -193,11 +193,10 @@ client.on('interactionCreate', async (interaction) => {
         )
 
       interaction.reply({ embeds: [embed] })
-      return
+    } else {
+      await deleteCmds()
+      await createCmds()
     }
-
-    await deleteCmds()
-    await createCmds()
   }
 
   if (commandName === 'activity') {
