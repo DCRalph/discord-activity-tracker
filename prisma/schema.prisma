@@ -18,7 +18,7 @@ model User {
 
 
   // status    Status[]
-  activities Activity[]
+  activities Activity[] 
 }
 
 // model Status {
@@ -41,7 +41,7 @@ model Activity {
   createdAt DateTime @default(now())
 
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   activityType String
 
