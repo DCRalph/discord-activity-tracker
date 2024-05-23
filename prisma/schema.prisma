@@ -48,6 +48,7 @@ model Activity {
   type      String
   name      String?
   details   String?
+  state     String?
 
   startedAt DateTime
   endedAt   DateTime?

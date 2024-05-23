@@ -38,7 +38,10 @@ type Presence = {
 
 type WhatToDo = {
   presence: Presence
-  status: boolean
+  status: {
+    oldStatus: PresenceStatus
+    newStatus: PresenceStatus
+  } | null
   oldActivities: ActivityItem[]
   newActivities: ActivityItem[]
 }
@@ -52,7 +55,11 @@ const activityTypeMap: { [key: number]: ActivityType } = {
   5: 'Competing',
 }
 
-const allowedActivityTypes = [0, 1, 2, 3]
+const allowedActivityTypes: ActivityType[] = [
+  'Playing',
+  'Streaming',
+  'Listening',
+]
 
 async function makeUser(id: string, username: string) {
   const userRecord = await prisma.user.findFirst({
@@ -77,16 +84,80 @@ async function makeUser(id: string, username: string) {
 
 async function preProcessPresence(presence: Presence) {
   let WhatToDo: WhatToDo = {
-    presence: null,
-    status: false,
+    presence: presence,
+    status: null,
     oldActivities: [],
     newActivities: [],
   }
 
   // check if the status has changed
   if (presence.oldStatus !== presence.newStatus) {
-    WhatToDo.status = true
+    WhatToDo.status = {
+      oldStatus: presence.oldStatus,
+      newStatus: presence.newStatus,
+    }
   }
+
+  for (const activity of presence.newActivities) {
+    // check if the activity is allowed
+    if (!allowedActivityTypes.includes(activity.type)) continue
+
+    // check if the activity is old
+    const oldActivity1 = presence.oldActivities.find((oldActivity) => {
+      return (
+        oldActivity.type === activity.type &&
+        oldActivity.name === activity.name &&
+        oldActivity.details === activity.details &&
+        oldActivity.state === activity.state
+      )
+    })
+
+    if (oldActivity1) {
+      continue
+    }
+
+    const oldActivity2 = WhatToDo.oldActivities.find((oldActivity) => {
+      return oldActivity.timestamps.start === activity.timestamps.start
+    })
+
+    if (oldActivity2) {
+      continue
+    }
+
+    WhatToDo.newActivities.push(activity)
+  }
+
+  for (const activity of presence.oldActivities) {
+    // check if the activity is allowed
+    if (!allowedActivityTypes.includes(activity.type)) continue
+
+    // check if activity has timestamps
+    if (activity.timestamps.end == null) {
+      continue
+    }
+
+    if (activity.timestamps.start == null) {
+      // check if the activity is in db
+      const dbActivity = await prisma.activity.findFirst({
+        where: {
+          userId: presence.discordId,
+          type: activity.type,
+          name: activity.name,
+          details: activity.details,
+          state: activity.state,
+          endedAt: activity.timestamps.end,
+        },
+      })
+
+      if (!dbActivity) {
+        continue
+      }
+    }
+
+    WhatToDo.oldActivities.push(activity)
+  }
+
+  return WhatToDo
 }
 
 async function handlePresence(
@@ -163,6 +234,10 @@ async function handlePresence(
   })
 
   console.log(inspect(presenceObj, { depth: null }))
+
+  const WhatToDo = await preProcessPresence(presenceObj)
+
+  console.log(inspect(WhatToDo, { depth: null }))
 }
 
 export { handlePresence }
