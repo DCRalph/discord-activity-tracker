@@ -192,6 +192,7 @@ client.on('interactionCreate', async (interaction) => {
           'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4'
         )
 
+      interaction.reply({ embeds: [embed] })
       return
     }
 
