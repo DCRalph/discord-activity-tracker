@@ -233,11 +233,11 @@ async function handlePresence(
     return obj
   })
 
-  console.log(inspect(presenceObj, { depth: null }))
+  console.log('presenceObj', inspect(presenceObj, { depth: null }))
 
   const WhatToDo = await preProcessPresence(presenceObj)
 
-  console.log(inspect(WhatToDo, { depth: null }))
+  console.log('WhatToDo', inspect(WhatToDo, { depth: null }))
 }
 
 export { handlePresence }
