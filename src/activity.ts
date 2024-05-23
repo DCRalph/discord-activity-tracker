@@ -170,7 +170,7 @@ async function handleActivityV2OldActivity(
 
     if (activityRecord) {
       console.log(
-        `[${user.username}, ${guild.name}] Updating activity record for old activity`
+        `[${user.username}, ${guild.name}] Updating activity record for old activity (${activity.name})...`
       )
 
       await prisma.activity.update({
@@ -186,7 +186,7 @@ async function handleActivityV2OldActivity(
     } else {
       // create a new activity record if there is no last activity record
       console.log(
-        `[${user.username}, ${guild.name}] Creating activity record for old activity ${activity.name}`
+        `[${user.username}, ${guild.name}] Creating activity record for old activity (${activity.name})...`
       )
 
       await prisma.activity.create({
