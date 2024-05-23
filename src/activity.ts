@@ -163,7 +163,7 @@ async function handleActivityV2OldActivity(
         details: activity.details,
 
         startedAt: activity.timestamps?.start,
-        endedAt: null,
+        // endedAt: null,
       },
       orderBy: {
         startedAt: 'desc',
