@@ -130,8 +130,8 @@ async function handleActivityLeaderboardCmd(
     const activities = user.activities
 
     let total = 0
-    for (const activity of activities) {
-      if (inBlacklist(activity.name)) continue
+    inner: for (const activity of activities) {
+      if (inBlacklist(activity.name)) continue inner
 
       total += activity.duration || 0
     }
