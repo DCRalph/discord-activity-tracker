@@ -1,5 +1,6 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
+import { inspect } from 'util'
 
 const prisma = new PrismaClient()
 
@@ -110,7 +111,7 @@ async function handlePresence(
     }
   })
 
-  console.log(presenceObj)
+  console.log(inspect(presenceObj, { depth: null }))
 }
 
 export { handlePresence }
