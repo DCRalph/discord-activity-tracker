@@ -160,8 +160,10 @@ async function handleActivityV2OldActivity(
 
         type: typeText,
         name: activity.name,
+        details: activity.details,
 
         startedAt: activity.timestamps?.start,
+        endedAt: null,
       },
       orderBy: {
         startedAt: 'desc',
@@ -171,6 +173,9 @@ async function handleActivityV2OldActivity(
     if (activityRecord) {
       console.log(
         `[${user.username}, ${guild.name}] Updating activity record for old activity (${activity.name})...`
+      )
+      console.log(
+        `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
       )
 
       await prisma.activity.update({
@@ -187,6 +192,9 @@ async function handleActivityV2OldActivity(
       // create a new activity record if there is no last activity record
       console.log(
         `[${user.username}, ${guild.name}] Creating activity record for old activity (${activity.name})...`
+      )
+      console.log(
+        `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
       )
 
       await prisma.activity.create({
@@ -233,30 +241,40 @@ async function handleActivityV2NewActivity(
       continue
     }
 
-    const existingActivity = await prisma.activity.findFirst({
+    const lastActivityRecord = await prisma.activity.findFirst({
       where: {
         userId: user.id,
         activityType: 'activity',
 
         type: typeText,
         name: activity.name,
+        details: activity.details,
 
-        startedAt: activity.timestamps.start,
+        // startedAt: activity.timestamps.start,
+        endedAt: null,
+      },
+      orderBy: {
+        startedAt: 'desc',
       },
     })
-
-    if (existingActivity) {
-      console.log(
-        `[${user.username}, ${guild.name}] Activity record already exists for ${activity.name}`
-      )
-      continue
-    }
 
     console.log(
       `[${user.username}, ${guild.name}] Creating activity record for ${activity.name}...`
     )
 
-    const activityRecord = await prisma.activity.create({
+    console.log(
+      `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
+    )
+
+    if (lastActivityRecord) {
+      console.log(
+        `[${user.username}, ${guild.name}] Activity record already exists for ${activity.name}. Skipping...`
+      )
+
+      continue
+    }
+
+    await prisma.activity.create({
       data: {
         userId: user.id,
         activityType: 'activity',
@@ -268,6 +286,48 @@ async function handleActivityV2NewActivity(
         startedAt: activity.timestamps.start,
       },
     })
+
+    //   const existingActivity = await prisma.activity.findFirst({
+    //     where: {
+    //       userId: user.id,
+    //       activityType: 'activity',
+
+    //       type: typeText,
+    //       name: activity.name,
+
+    //       startedAt: activity.timestamps.start,
+    //       endedAt: null,
+    //     },
+    //   })
+
+    //   console.log(
+    //     `[${user.username}, ${guild.name}] Creating activity record for ${activity.name}...`
+    //   )
+
+    //   console.log(
+    //     `[${user.username}, ${guild.name}] Type: ${activity.type} Details: ${activity.details}`
+    //   )
+
+    //   if (existingActivity) {
+    //     console.log(
+    //       `[${user.username}, ${guild.name}] Activity record already exists for ${activity.name}. Skipping...`
+    //     )
+
+    //     continue
+    //   }
+
+    //   const activityRecord = await prisma.activity.create({
+    //     data: {
+    //       userId: user.id,
+    //       activityType: 'activity',
+
+    //       type: typeText,
+    //       name: activity.name,
+    //       details: activity.details,
+
+    //       startedAt: activity.timestamps.start,
+    //     },
+    //   })
   }
 }
 
@@ -318,7 +378,9 @@ async function handleActivityV2(
 
   // ############### activities ###############
 
-  console.log(`[${discordUser.username}, ${guild.name}] Checking activities...`)
+  console.log(
+    `[${discordUser.username}, ${guild.name}] Checking old activities...`
+  )
 
   if (oldPresence !== null) {
     try {
@@ -347,6 +409,11 @@ async function handleActivityV2(
       return
     }
   }
+
+  console.log(
+    `[${discordUser.username}, ${guild.name}] Checking new activities...`
+  )
+
   try {
     await handleActivityV2NewActivity(newPresence, user, guild)
   } catch (error) {
