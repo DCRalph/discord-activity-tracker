@@ -4,7 +4,7 @@ sudo systemctl stop startdiscord.service
 
 git pull
 
-npm run install
+npm run installdeps
 npm run db push
 npm run dbgenerate
 
