@@ -131,7 +131,9 @@ async function handleActivityLeaderboardCmd(
 
     let total = 0
     inner: for (const activity of activities) {
-      // if (inBlacklist(activity.name)) continue inner
+      if (inBlacklist(activity.name)) continue inner
+      console.log(activity.endedAt)
+      console.log(activity.duration)
 
       total += activity.duration || 0
     }
