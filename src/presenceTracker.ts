@@ -9,14 +9,17 @@ const activityTypeMap = {
   1: 'Streaming',
   2: 'Listening',
   3: 'Watching',
-  // 4: 'Custom',
-  // 5: 'Competing',
+  4: 'Custom',
+  5: 'Competing',
 }
+
+const allowedActivityTypes = [0, 1, 2, 3]
 
 type ActivityItem = {
   type: string
   name: string
-  details: string
+  details: string | null
+  state: string | null
   timestamps: {
     start: Date | null
     end: Date | null
@@ -91,6 +94,7 @@ async function handlePresence(
         type: activityTypeMap[activity.type],
         name: activity.name,
         details: activity.details,
+        state: activity.state,
         timestamps: {
           start: activity.timestamps?.start ?? now,
           end: activity.timestamps?.end ?? now,
@@ -104,6 +108,7 @@ async function handlePresence(
       type: activityTypeMap[activity.type],
       name: activity.name,
       details: activity.details,
+      state: activity.state,
       timestamps: {
         start: activity.timestamps?.start ?? now,
         end: activity.timestamps?.end ?? now,
