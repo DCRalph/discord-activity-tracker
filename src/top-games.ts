@@ -8,6 +8,8 @@ const prisma = new PrismaClient()
 async function handleTopGames(interaction: Discord.CommandInteraction) {
   // get all users and group by game
 
+  const now = new Date()
+
   const users = await prisma.user.findMany({
     include: {
       activities: {
@@ -23,6 +25,10 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
   for (const user of users) {
     for (const activity of user.activities) {
       if (inBlacklist(activity.name)) continue
+
+      let duration =
+        activity.duration ||
+        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
       if (gameTotals[activity.name]) {
         gameTotals[activity.name] += activity.duration

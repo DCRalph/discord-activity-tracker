@@ -1,5 +1,5 @@
 function prettySeconds(seconds: number) {
-  // convert secconds to days, hours, minutes, seconds
+  // convert seconds to days, hours, minutes, seconds
   // only include the largest unit that is not zero
   const days = Math.floor(seconds / 86400)
   seconds %= 86400

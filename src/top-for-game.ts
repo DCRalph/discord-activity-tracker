@@ -3,7 +3,6 @@ import { PrismaClient, User } from '@prisma/client'
 import { prettySeconds } from './prettySeconds'
 import { inBlacklist } from './blacklist'
 
-
 const prisma = new PrismaClient()
 
 async function getUniqueGames() {
@@ -46,7 +45,9 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     return
   }
 
-  let activitys = await prisma.activity.findMany({
+  const now = new Date()
+
+  let activities = await prisma.activity.findMany({
     where: {
       activityType: 'activity',
     },
@@ -56,22 +57,22 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   })
 
   if (
-    activitys.find(
+    activities.find(
       (activity) => activity.name.toLowerCase() == game.toLowerCase()
     )
   ) {
-    activitys = activitys.filter((activity) => {
+    activities = activities.filter((activity) => {
       return activity.name == game
     })
   } else {
-    activitys = activitys.filter((activity) => {
+    activities = activities.filter((activity) => {
       return activity.name.toLowerCase().startsWith(game.toLowerCase())
     })
   }
 
-  console.log(activitys)
+  console.log(activities)
 
-  if (!activitys.length) {
+  if (!activities.length) {
     const games = await getUniqueGames()
 
     let msg = 'No users found for game, valid games are:\n'
@@ -84,15 +85,19 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     return
   }
 
-  const fullGameName = activitys[0].name
+  const fullGameName = activities[0].name
 
   let userTotals: Record<string, number> = {}
 
-  for (const activity of activitys) {
+  for (const activity of activities) {
+    let duration =
+      activity.duration ||
+      ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+
     if (userTotals[activity.user.username]) {
-      userTotals[activity.user.username] += activity.duration
+      userTotals[activity.user.username] += duration
     } else {
-      userTotals[activity.user.username] = activity.duration
+      userTotals[activity.user.username] = duration
     }
   }
 

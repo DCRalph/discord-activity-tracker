@@ -12,8 +12,6 @@ const activityTypeMap = {
   // 5: 'Competing',
 }
 
-let usersProsessing = new Set<String>()
-
 async function makeUser(user: Discord.User) {
   const userRecord = await prisma.user.findFirst({
     where: {
@@ -73,7 +71,7 @@ async function handleActivityV2Status(
       }
 
       console.log(
-        `[${user.username}, ${guild.name}] Updateing last status record`
+        `[${user.username}, ${guild.name}] Updating last status record`
       )
 
       await prisma.activity.update({

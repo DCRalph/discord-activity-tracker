@@ -32,6 +32,7 @@ const botActivity: Discord.ActivityOptions = {
 }
 
 let userGuildMap = new Map<string, string>()
+let usersProcessing = new Set<String>()
 
 async function deleteCmds() {
   const commands = await client.application.commands.fetch()
@@ -140,6 +141,15 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
 
   if (!discordUser.id) return
 
+  if (usersProcessing.has(discordUser.id)) {
+    console.log(
+      `[${discordUser.username}, ${guild.name}] Already processing...`
+    )
+    return
+  }
+
+  usersProcessing.add(discordUser.id)
+
   const userAllowedGuild = userGuildMap.get(discordUser.id)
 
   if (!userAllowedGuild) {
@@ -158,6 +168,8 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   console.log(`[${discordUser.username}, ${guild.name}] Done`)
   console.log('.')
   console.log('.')
+
+  usersProcessing.delete(discordUser.id)
 })
 
 client.on('interactionCreate', async (interaction) => {

@@ -24,13 +24,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       discordId: discordUser.id,
     },
     include: {
-      activities: {
-        where: {
-          type: {
-            not: 'offline',
-          },
-        },
-      },
+      activities: true,
     },
   })
 
@@ -56,7 +50,10 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       } else {
         activityTotals[activity.name] = duration
       }
-    } else if (activity.activityType == 'status') {
+    } else if (
+      activity.activityType == 'status' &&
+      activity.type != 'offline'
+    ) {
       const duration =
         activity.duration ||
         ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
@@ -132,10 +129,10 @@ async function handleActivityLeaderboardCmd(
     let total = 0
     inner: for (const activity of activities) {
       // if (inBlacklist(activity.name)) continue inner
-      console.log(activity.endedAt)
-      console.log(activity.duration)
 
-      total += activity.duration || 0
+      total +=
+        activity.duration ||
+        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
     }
 
     userTotals[user.username] = total
