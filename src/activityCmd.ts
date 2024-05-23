@@ -119,7 +119,7 @@ async function handleActivityLeaderboardCmd(
 ) {
   const users = await prisma.user.findMany({
     include: {
-      activities: { where: { type: 'activity' } },
+      activities: { where: { activityType: 'activity' } },
     },
   })
 
