@@ -4,19 +4,17 @@ import { inspect } from 'util'
 
 const prisma = new PrismaClient()
 
-const activityTypeMap = {
-  0: 'Playing',
-  1: 'Streaming',
-  2: 'Listening',
-  3: 'Watching',
-  4: 'Custom',
-  5: 'Competing',
-}
-
-const allowedActivityTypes = [0, 1, 2, 3]
+type ActivityType =
+  | 'Playing'
+  | 'Streaming'
+  | 'Listening'
+  | 'Watching'
+  | 'Custom'
+  | 'Competing'
+type PresenceStatus = Discord.PresenceStatus
 
 type ActivityItem = {
-  type: string
+  type: ActivityType
   name: string
   details: string | null
   state: string | null
@@ -32,24 +30,42 @@ type Presence = {
   guildId: string
   guildName: string
 
-  oldStatus: string
-  newStatus: string
+  oldStatus: PresenceStatus
+  newStatus: PresenceStatus
   oldActivities: ActivityItem[]
   newActivities: ActivityItem[]
 }
 
-async function makeUser(user: Discord.User) {
+type WhatToDo = {
+  presence: Presence
+  status: boolean
+  oldActivities: ActivityItem[]
+  newActivities: ActivityItem[]
+}
+
+const activityTypeMap: { [key: number]: ActivityType } = {
+  0: 'Playing',
+  1: 'Streaming',
+  2: 'Listening',
+  3: 'Watching',
+  4: 'Custom',
+  5: 'Competing',
+}
+
+const allowedActivityTypes = [0, 1, 2, 3]
+
+async function makeUser(id: string, username: string) {
   const userRecord = await prisma.user.findFirst({
     where: {
-      discordId: user.id,
+      discordId: id,
     },
   })
 
   if (!userRecord) {
     const newUserRecord = await prisma.user.create({
       data: {
-        discordId: user.id,
-        username: user.username,
+        discordId: id,
+        username: username,
       },
     })
 
@@ -57,6 +73,23 @@ async function makeUser(user: Discord.User) {
   }
 
   return userRecord
+}
+
+async function preProcessPresence(presence: Presence) {
+  let WhatToDo: WhatToDo = {
+    presence: null,
+    status: false,
+    oldActivities: [],
+    newActivities: [],
+  }
+
+  // check if the status has changed
+  if (presence.oldStatus !== presence.newStatus) {
+    WhatToDo.status = true
+  }
+
+
+
 }
 
 async function handlePresence(
@@ -68,7 +101,7 @@ async function handlePresence(
 
   if (!discordUser) return
 
-  const user = await makeUser(discordUser)
+  const user = await makeUser(discordUser.id, discordUser.username)
 
   // if (discordUser.id != '472872051359612945') return // for testing
 
@@ -90,30 +123,34 @@ async function handlePresence(
 
   if (oldPresence) {
     presenceObj.oldActivities = oldPresence.activities.map((activity) => {
-      return {
+      let obj = {
         type: activityTypeMap[activity.type],
         name: activity.name,
         details: activity.details,
         state: activity.state,
         timestamps: {
-          start: activity.timestamps?.start ?? now,
-          end: activity.timestamps?.end ?? now,
+          start: activity.timestamps?.start,
+          end: activity.timestamps?.end,
         },
       }
+
+      return obj
     })
   }
 
   presenceObj.newActivities = newPresence.activities.map((activity) => {
-    return {
+    let obj = {
       type: activityTypeMap[activity.type],
       name: activity.name,
       details: activity.details,
       state: activity.state,
       timestamps: {
-        start: activity.timestamps?.start ?? now,
-        end: activity.timestamps?.end ?? now,
+        start: activity.timestamps?.start,
+        end: activity.timestamps?.end,
       },
     }
+
+    return obj
   })
 
   console.log(inspect(presenceObj, { depth: null }))
