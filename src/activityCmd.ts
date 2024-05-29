@@ -147,7 +147,7 @@ async function handleActivityLeaderboardCmd(
         username,
         duration,
       }
-    })
+    }).filter(user => user.duration > 0)
 
   const embed = new Discord.EmbedBuilder()
     .setTitle('Activity Leaderboard')
