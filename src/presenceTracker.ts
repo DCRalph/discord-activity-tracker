@@ -25,8 +25,7 @@ type ActivityItem = {
 }
 
 type Presence = {
-  discordId: string
-  username: string
+  user: User
   guildId: string
   guildName: string
 
@@ -44,6 +43,7 @@ type WhatToDo = {
   } | null
   oldActivities: ActivityItem[]
   newActivities: ActivityItem[]
+  nothing: boolean
 }
 
 const activityTypeMap: { [key: number]: ActivityType } = {
@@ -88,19 +88,42 @@ async function preProcessPresence(presence: Presence) {
     status: null,
     oldActivities: [],
     newActivities: [],
+    nothing: true,
   }
 
   // check if the status has changed
-  if (presence.oldStatus !== presence.newStatus) {
+  console.log(
+    `[${presence.user.username}, ${presence.guildName}] pre processing status...`
+  )
+  if (
+    presence.oldStatus !== presence.newStatus &&
+    presence.oldStatus !== null
+  ) {
     WhatToDo.status = {
       oldStatus: presence.oldStatus,
       newStatus: presence.newStatus,
     }
+    WhatToDo.nothing = false
+    console.log(
+      `[${presence.user.username}, ${presence.guildName}] changed status from ${presence.oldStatus} to ${presence.newStatus}`
+    )
+  } else {
+    console.log(
+      `[${presence.user.username}, ${presence.guildName}] status has not changed`
+    )
   }
 
+  console.log(
+    `[${presence.user.username}, ${presence.guildName}] pre processing new activities...`
+  )
   for (const activity of presence.newActivities) {
     // check if the activity is allowed
-    if (!allowedActivityTypes.includes(activity.type)) continue
+    if (!allowedActivityTypes.includes(activity.type)) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] [${activity.type}] ${activity.name} is not allowed. Continuing...`
+      )
+      continue
+    }
 
     // check if the activity is old
     const oldActivity1 = presence.oldActivities.find((oldActivity) => {
@@ -113,6 +136,10 @@ async function preProcessPresence(presence: Presence) {
     })
 
     if (oldActivity1) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] already started 1 [${activity.type}] ${activity.name}. Continuing...`
+      )
+
       continue
     }
 
@@ -121,18 +148,37 @@ async function preProcessPresence(presence: Presence) {
     })
 
     if (oldActivity2) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] already started 2 [${activity.type}] ${activity.name}. Continuing...`
+      )
       continue
     }
 
     WhatToDo.newActivities.push(activity)
+    WhatToDo.nothing = false
+
+    console.log(
+      `[${presence.user.username}, ${presence.guildName}] started [${activity.type}] ${activity.name}`
+    )
   }
 
+  console.log(
+    `[${presence.user.username}, ${presence.guildName}] pre processing old activities...`
+  )
   for (const activity of presence.oldActivities) {
     // check if the activity is allowed
-    if (!allowedActivityTypes.includes(activity.type)) continue
+    if (!allowedActivityTypes.includes(activity.type)) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] [${activity.type}] ${activity.name} is not allowed. Continuing...`
+      )
+      continue
+    }
 
     // check if activity has timestamps
     if (activity.timestamps.end == null) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] has an ongoing activity [${activity.type}] ${activity.name}. Continuing...`
+      )
       continue
     }
 
@@ -140,24 +186,248 @@ async function preProcessPresence(presence: Presence) {
       // check if the activity is in db
       const dbActivity = await prisma.activity.findFirst({
         where: {
-          userId: presence.discordId,
+          userId: presence.user.discordId,
           type: activity.type,
           name: activity.name,
           details: activity.details,
           state: activity.state,
-          endedAt: activity.timestamps.end,
+          // endedAt: activity.timestamps.end,
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       })
 
       if (!dbActivity) {
+        console.log(
+          `[${presence.user.username}, ${presence.guildName}] [${activity.type}] ${activity.name} was not found in db. Continuing...`
+        )
         continue
       }
     }
 
     WhatToDo.oldActivities.push(activity)
+    WhatToDo.nothing = false
+
+    console.log(
+      `[${presence.user.username}, ${presence.guildName}] ended [${activity.type}] ${activity.name}`
+    )
   }
 
+  console.log(
+    `[${presence.user.username}, ${presence.guildName}] pre processing done`
+  )
+
   return WhatToDo
+}
+
+async function processPresence(WhatToDo: WhatToDo) {
+  const now = new Date()
+
+  console.log(
+    `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] processing...`
+  )
+
+  if (WhatToDo.nothing) {
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] nothing to do`
+    )
+    return
+  }
+
+  if (WhatToDo.status) {
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] updating status...`
+    )
+
+    const lastStatusRecord = await prisma.activity.findFirst({
+      where: {
+        userId: WhatToDo.presence.user.id,
+        activityType: 'status',
+        type: WhatToDo.status.oldStatus,
+        endedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    if (lastStatusRecord) {
+      // update the end time of the last status
+
+      console.log(
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] updating last status...`
+      )
+
+      await prisma.activity.update({
+        where: {
+          id: lastStatusRecord.id,
+        },
+        data: {
+          details: `${WhatToDo.status.oldStatus} -> ${WhatToDo.status.newStatus}`,
+          endedAt: now,
+          duration: now.getTime() - lastStatusRecord.startedAt.getTime(),
+        },
+      })
+    }
+    // create a new status record
+
+    await prisma.activity.create({
+      data: {
+        userId: WhatToDo.presence.user.id,
+        activityType: 'status',
+        type: WhatToDo.status.newStatus,
+        name: lastStatusRecord ? null : 'no previous status',
+        startedAt: now,
+      },
+    })
+
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] updated status`
+    )
+  }
+
+  // process old activities
+  for (const activity of WhatToDo.oldActivities) {
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] processing old activity, [${activity.type}] ${activity.name}...`
+    )
+
+    if (!activity.timestamps.start) {
+      console.log(
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, skipping...`
+      )
+      continue
+    }
+
+    const dbActivity = await prisma.activity.findFirst({
+      where: {
+        userId: WhatToDo.presence.user.id,
+        activityType: 'activity',
+        type: activity.type,
+        name: activity.name,
+        details: activity.details,
+        state: activity.state,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    if (!dbActivity) {
+      if (
+        activity.timestamps.start != null &&
+        activity.timestamps.end != null
+      ) {
+        console.log(
+          `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db but have start and end time.`
+        )
+        console.log(
+          `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] creating new activity, [${activity.type}] ${activity.name}`
+        )
+
+        await prisma.activity.create({
+          data: {
+            userId: WhatToDo.presence.user.id,
+            activityType: 'activity',
+            type: activity.type,
+            name: activity.name,
+            details: activity.details,
+            state: activity.state,
+            startedAt: activity.timestamps.start,
+            endedAt: now,
+            duration:
+              now.getTime() -
+              activity.timestamps.start.getTime(),
+          },
+        })
+      } else {
+        console.log(
+          `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db, skipping...`
+        )
+      }
+      continue
+    }
+
+    if (dbActivity.startedAt !== activity.timestamps.start) {
+      console.log(
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity start time mismatch. potential wrong`
+      )
+      // continue
+    }
+
+    await prisma.activity.update({
+      where: {
+        id: dbActivity.id,
+      },
+      data: {
+        endedAt: now,
+        duration: now.getTime() - dbActivity.startedAt.getTime(),
+      },
+    })
+
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] updated old activity, [${activity.type}] ${activity.name}`
+    )
+  }
+
+  // process new activities
+  for (const activity of WhatToDo.newActivities) {
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] processing new activity, [${activity.type}] ${activity.name}...`
+    )
+
+    if (!activity.timestamps.start) {
+      console.log(
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, skipping...`
+      )
+      continue
+    }
+
+    // check if the activity is in db
+
+    const dbActivity = await prisma.activity.findFirst({
+      where: {
+        userId: WhatToDo.presence.user.id,
+        activityType: 'activity',
+        type: activity.type,
+        name: activity.name,
+        details: activity.details,
+        state: activity.state,
+        startedAt: activity.timestamps.start,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    if (dbActivity) {
+      console.log(
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity already in db, skipping...`
+      )
+      continue
+    }
+
+    await prisma.activity.create({
+      data: {
+        userId: WhatToDo.presence.user.id,
+        activityType: 'activity',
+        type: activity.type,
+        name: activity.name,
+        details: activity.details,
+        state: activity.state,
+        startedAt: activity.timestamps.start,
+      },
+    })
+
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] created new activity, [${activity.type}] ${activity.name}`
+    )
+  }
+
+  console.log(
+    `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] processing done`
+  )
 }
 
 async function handlePresence(
@@ -171,7 +441,7 @@ async function handlePresence(
 
   const user = await makeUser(discordUser.id, discordUser.username)
 
-  // if (discordUser.id != '472872051359612945') return // for testing
+  if (discordUser.id != '472872051359612945') return // for testing
 
   const now = new Date()
 
@@ -179,8 +449,7 @@ async function handlePresence(
   const newStatus = newPresence.status
 
   const presenceObj: Presence = {
-    discordId: discordUser.id,
-    username: discordUser.username,
+    user: user,
     guildId: guild.id,
     guildName: guild.name,
     oldStatus: null,
@@ -190,7 +459,7 @@ async function handlePresence(
   }
 
   if (oldPresence) {
-    presenceObj.oldStatus = oldPresence.status
+    presenceObj.oldStatus = oldStatus
 
     presenceObj.oldActivities = oldPresence.activities.map((activity) => {
       let obj = {
@@ -233,10 +502,24 @@ async function handlePresence(
     return obj
   })
 
+  let WhatToDo: WhatToDo
+
+  try {
+    WhatToDo = await preProcessPresence(presenceObj)
+    await processPresence(WhatToDo)
+  } catch (error) {
+    console.log('.')
+    console.log('.')
+
+    console.log(
+      `[${presenceObj.user.username}, ${presenceObj.guildName}] Error on handle status: ${error}`
+    )
+
+    console.log('.')
+    console.log('.')
+  }
+
   console.log('presenceObj', inspect(presenceObj, { depth: null }))
-
-  const WhatToDo = await preProcessPresence(presenceObj)
-
   console.log('WhatToDo', inspect(WhatToDo, { depth: null }))
 }
 

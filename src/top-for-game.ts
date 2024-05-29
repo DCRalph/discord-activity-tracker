@@ -70,7 +70,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     })
   }
 
-  console.log(activities)
+  // console.log(activities)
 
   if (!activities.length) {
     const games = await getUniqueGames()
@@ -92,7 +92,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   for (const activity of activities) {
     const duration =
       activity.duration !== null
-        ? activity.duration
+        ? ~~(activity.duration / 1000)
         : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
     if (userTotals[activity.user.username]) {

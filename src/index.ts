@@ -146,7 +146,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
     userGuildMap.set(discordUser.id, guild.id)
   } else if (userAllowedGuild !== guild.id) {
     console.log(
-      `User ${discordUser.username} is in multiple guilds, skipping ${guild.name}...`
+      `[${discordUser.username}, ${guild.name}]  is in multiple guilds, skipping ${guild.name}...`
     )
     return
   }
@@ -164,7 +164,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
 
   console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
-  await handleActivityV2(oldPresence, newPresence, guild)
+  // await handleActivityV2(oldPresence, newPresence, guild)
   await handlePresence(oldPresence, newPresence, guild)
 
   console.log(`[${discordUser.username}, ${guild.name}] Done`)

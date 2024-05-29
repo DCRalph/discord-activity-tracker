@@ -21,20 +21,28 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
   })
 
   let gameTotals: Record<string, number> = {}
+  let userTotals: Record<string, number> = {}
+  let userTotalsMap = new Map<string, string>()
 
   for (const user of users) {
     inner: for (const activity of user.activities) {
-      if (inBlacklist(activity.name)) continue inner
-
       const duration =
         activity.duration !== null
-          ? activity.duration
+          ? ~~(activity.duration / 1000)
           : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
-      if (gameTotals[activity.name]) {
-        gameTotals[activity.name] += activity.duration
+      if (userTotals[activity.name]) {
+        userTotals[activity.name] += duration
       } else {
-        gameTotals[activity.name] = activity.duration
+        userTotals[activity.name] = duration
+      }
+
+      if (inBlacklist(activity.name)) continue inner
+
+      if (gameTotals[activity.name]) {
+        gameTotals[activity.name] += duration
+      } else {
+        gameTotals[activity.name] = duration
       }
     }
   }
@@ -42,23 +50,7 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
   let gameTotalsArray = Object.entries(gameTotals)
   gameTotalsArray.sort((a, b) => b[1] - a[1])
 
-  // get user with most time in each game
-
-  let userTotals: Record<string, number> = {}
-
-  for (const user of users) {
-    for (const activity of user.activities) {
-      if (userTotals[activity.name]) {
-        userTotals[activity.name] += activity.duration
-      } else {
-        userTotals[activity.name] = activity.duration
-      }
-    }
-  }
-
   let userTotalsArray = Object.entries(userTotals)
-
-  let userTotalsMap = new Map<string, string>()
 
   for (const [game, duration] of userTotalsArray) {
     let user = users.find((user) => {

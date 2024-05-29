@@ -43,7 +43,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     if (activity.activityType == 'activity') {
       const duration =
         activity.duration !== null
-          ? activity.duration
+          ? ~~(activity.duration / 1000)
           : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
       if (activityTotals[activity.name]) {
@@ -57,7 +57,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     ) {
       const duration =
         activity.duration !== null
-          ? activity.duration
+          ? ~~(activity.duration / 1000)
           : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
 
       if (statusTotals[activity.type]) {
@@ -133,7 +133,7 @@ async function handleActivityLeaderboardCmd(
       if (inBlacklist(activity.name)) continue inner
 
       total +=
-        activity.duration ||
+        ~~(activity.duration / 1000) ||
         ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
     }
 
