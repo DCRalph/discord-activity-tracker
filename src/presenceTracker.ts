@@ -113,6 +113,7 @@ async function preProcessPresence(presence: Presence) {
     )
   }
 
+  console.log('.')
   console.log(
     `[${presence.user.username}, ${presence.guildName}] pre processing new activities...`
   )
@@ -143,16 +144,16 @@ async function preProcessPresence(presence: Presence) {
       continue
     }
 
-    const oldActivity2 = WhatToDo.oldActivities.find((oldActivity) => {
-      return oldActivity.timestamps.start === activity.timestamps.start
-    })
+    // const oldActivity2 = WhatToDo.oldActivities.find((oldActivity) => {
+    //   return oldActivity.timestamps.start === activity.timestamps.start
+    // })
 
-    if (oldActivity2) {
-      console.log(
-        `[${presence.user.username}, ${presence.guildName}] already started 2 [${activity.type}] ${activity.name}. Continuing...`
-      )
-      continue
-    }
+    // if (oldActivity2) {
+    //   console.log(
+    //     `[${presence.user.username}, ${presence.guildName}] already started 2 [${activity.type}] ${activity.name}. Continuing...`
+    //   )
+    //   continue
+    // }
 
     WhatToDo.newActivities.push(activity)
     WhatToDo.nothing = false
@@ -162,6 +163,7 @@ async function preProcessPresence(presence: Presence) {
     )
   }
 
+  console.log('.')
   console.log(
     `[${presence.user.username}, ${presence.guildName}] pre processing old activities...`
   )
@@ -176,22 +178,27 @@ async function preProcessPresence(presence: Presence) {
 
     // check if activity has timestamps
     if (activity.timestamps.end == null) {
+      // console.log(
+      //   `[${presence.user.username}, ${presence.guildName}] has an ongoing activity [${activity.type}] ${activity.name}. Continuing...`
+      // )
+      // continue
+
       console.log(
-        `[${presence.user.username}, ${presence.guildName}] has an ongoing activity [${activity.type}] ${activity.name}. Continuing...`
+        `[${presence.user.username}, ${presence.guildName}] [${activity.type}] ${activity.name} has no end time. Setting to now...`
       )
-      continue
+
+      activity.timestamps.end = new Date()
     }
 
     if (activity.timestamps.start == null) {
       // check if the activity is in db
       const dbActivity = await prisma.activity.findFirst({
         where: {
-          userId: presence.user.discordId,
+          userId: presence.user.id,
           type: activity.type,
           name: activity.name,
           details: activity.details,
           state: activity.state,
-          // endedAt: activity.timestamps.end,
         },
         orderBy: {
           createdAt: 'desc',
@@ -236,6 +243,7 @@ async function processPresence(WhatToDo: WhatToDo) {
   }
 
   if (WhatToDo.status) {
+    console.log('.')
     console.log(
       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] updating status...`
     )
@@ -289,16 +297,17 @@ async function processPresence(WhatToDo: WhatToDo) {
 
   // process old activities
   for (const activity of WhatToDo.oldActivities) {
+    console.log('.')
     console.log(
       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] processing old activity, [${activity.type}] ${activity.name}...`
     )
 
-    if (!activity.timestamps.start) {
-      console.log(
-        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, skipping...`
-      )
-      continue
-    }
+    // if (!activity.timestamps.start) {
+    //   console.log(
+    //     `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, skipping...`
+    //   )
+    //   continue
+    // }
 
     const dbActivity = await prisma.activity.findFirst({
       where: {
@@ -308,44 +317,52 @@ async function processPresence(WhatToDo: WhatToDo) {
         name: activity.name,
         details: activity.details,
         state: activity.state,
+        endedAt: null,
       },
       orderBy: {
         createdAt: 'desc',
       },
     })
 
-    if (!dbActivity) {
-      if (
-        activity.timestamps.start != null &&
-        activity.timestamps.end != null
-      ) {
-        console.log(
-          `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db but have start and end time.`
-        )
-        console.log(
-          `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] creating new activity, [${activity.type}] ${activity.name}`
-        )
+    // if (!dbActivity) {
+    //   if (
+    //     activity.timestamps.start != null &&
+    //     activity.timestamps.end != null
+    //   ) {
+    //     console.log(
+    //       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db but have start and end time.`
+    //     )
+    //     console.log(
+    //       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] creating new activity, [${activity.type}] ${activity.name}`
+    //     )
 
-        await prisma.activity.create({
-          data: {
-            userId: WhatToDo.presence.user.id,
-            activityType: 'activity',
-            type: activity.type,
-            name: activity.name,
-            details: activity.details,
-            state: activity.state,
-            startedAt: activity.timestamps.start,
-            endedAt: now,
-            duration:
-              now.getTime() -
-              activity.timestamps.start.getTime(),
-          },
-        })
-      } else {
-        console.log(
-          `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db, skipping...`
-        )
-      }
+    //     await prisma.activity.create({
+    //       data: {
+    //         userId: WhatToDo.presence.user.id,
+    //         activityType: 'activity',
+    //         type: activity.type,
+    //         name: activity.name,
+    //         details: activity.details,
+    //         state: activity.state,
+    //         startedAt: activity.timestamps.start,
+    //         endedAt: now,
+    //         duration:
+    //           now.getTime() -
+    //           activity.timestamps.start.getTime(),
+    //       },
+    //     })
+    //   } else {
+    //     console.log(
+    //       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db, skipping...`
+    //     )
+    //   }
+    //   continue
+    // }
+
+    if (!dbActivity) {
+      console.log(
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity not found in db, skipping...`
+      )
       continue
     }
 
@@ -373,15 +390,23 @@ async function processPresence(WhatToDo: WhatToDo) {
 
   // process new activities
   for (const activity of WhatToDo.newActivities) {
+    console.log('.')
     console.log(
       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] processing new activity, [${activity.type}] ${activity.name}...`
     )
 
+    // if (!activity.timestamps.start) {
+    //   console.log(
+    //     `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, skipping...`
+    //   )
+    //   continue
+    // }
+
     if (!activity.timestamps.start) {
       console.log(
-        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, skipping...`
+        `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] activity has no start time, setting to now...`
       )
-      continue
+      activity.timestamps.start = now
     }
 
     // check if the activity is in db
@@ -441,7 +466,7 @@ async function handlePresence(
 
   const user = await makeUser(discordUser.id, discordUser.username)
 
-  if (discordUser.id != '472872051359612945') return // for testing
+  // if (discordUser.id != '472872051359612945') return // for testing
 
   const now = new Date()
 
@@ -519,7 +544,7 @@ async function handlePresence(
     console.log('.')
   }
 
-  console.log('presenceObj', inspect(presenceObj, { depth: null }))
+  // console.log('presenceObj', inspect(presenceObj, { depth: null }))
   console.log('WhatToDo', inspect(WhatToDo, { depth: null }))
 }
 
