@@ -138,7 +138,7 @@ async function preProcessPresence(presence: Presence) {
 
     if (oldActivity1) {
       console.log(
-        `[${presence.user.username}, ${presence.guildName}] already started 1 [${activity.type}] ${activity.name}. Continuing...`
+        `[${presence.user.username}, ${presence.guildName}]  [${activity.type}] ${activity.name} is in old activities. Continuing...`
       )
 
       continue
@@ -188,6 +188,23 @@ async function preProcessPresence(presence: Presence) {
       )
 
       activity.timestamps.end = new Date()
+    }
+
+    // check if the activity is new
+    const newActivity = presence.newActivities.find((newActivity) => {
+      return (
+        newActivity.type === activity.type &&
+        newActivity.name === activity.name &&
+        newActivity.details === activity.details &&
+        newActivity.state === activity.state
+      )
+    })
+
+    if (newActivity) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] [${activity.type}] ${activity.name} is in new activities. Continuing...`
+      )
+      continue
     }
 
     if (activity.timestamps.start == null) {
