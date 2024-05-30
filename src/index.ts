@@ -306,7 +306,7 @@ client.on('interactionCreate', async (interaction) => {
   } catch (e) {
     console.log(e)
 
-    prisma.error.create({
+    await prisma.error.create({
       data: {
         where: 'interactionCreate',
 
