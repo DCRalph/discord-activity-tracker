@@ -1,4 +1,4 @@
-1SELECT "Activity".*, "User"."username"
+SELECT "Activity".*, "User"."username"
 FROM "Activity"
 LEFT JOIN "User" ON "Activity"."userId" = "User"."id"
 	-- WHERE "userId" = 'clwj0jrx90028sgvmd3e0wnsv'
