@@ -20,6 +20,11 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     },
   })
 
+  if (!users.length) {
+    await interaction.reply('No users found')
+    return
+  }
+
   let userTotals: Record<string, number> = {}
 
   for (const user of users) {
