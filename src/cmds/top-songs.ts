@@ -49,7 +49,7 @@ async function handleTopSongs(interaction: Discord.CommandInteraction) {
 
   const embed = new Discord.EmbedBuilder()
     .setTitle('Top Songs')
-    .setDescription('Rank songs by total plays')
+    .setDescription('Rank songs by total plays. Unique songs: ' + sortedSongs.length)
     .setColor('Random')
     .setTimestamp(now)
 
