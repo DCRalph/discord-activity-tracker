@@ -137,9 +137,7 @@ async function createCmds() {
     ])
 
     createAll.forEach((result) => {
-      if (result.status === 'fulfilled') {
-        console.log(`Command created for ${guild.name}`)
-      } else {
+      if (result.status !== 'fulfilled') {
         console.log(`Command creation failed for ${guild.name}`)
       }
     })
@@ -195,7 +193,7 @@ async function createCmds() {
     //   description: 'Rank users by total time spent listening to music',
     // })
 
-    // console.log(`Commands created for ${guild.name}`)
+    console.log(`Commands created for ${guild.name}`)
   }
 }
 
@@ -292,8 +290,21 @@ client.on('interactionCreate', async (interaction) => {
         ],
       })
     } else {
+      const embed = new Discord.EmbedBuilder()
+        .setTitle('Recreating commands')
+        .setColor('Random')
+        .setDescription('Recreating all commands...')
+
+      const reply = await interaction.reply({
+        embeds: [embed],
+      })
+
       await deleteCmds()
       await createCmds()
+
+      reply.edit({
+        embeds: [embed.setDescription('Recreating all commands done')],
+      })
     }
   }
 
