@@ -68,7 +68,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   }
 
   const embed = new Discord.EmbedBuilder()
-    .setTitle('Activity Summary')
+    .setTitle('Activity Summary ' + discordUser.username)
     .setColor('Random')
     .setTimestamp(now)
 
