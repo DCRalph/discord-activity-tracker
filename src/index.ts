@@ -10,6 +10,7 @@ import { handleTopGames } from './cmds/top-games'
 import { handleTopForGame } from './cmds/top-for-game'
 import { handleMusicLeaderboardCmd } from './cmds/musicLeaderboard'
 import { promises } from 'fs'
+import { handleTopSongs } from './cmds/top-songs'
 
 dotenv.config()
 
@@ -134,6 +135,11 @@ async function createCmds() {
         name: 'music-leaderboard',
         description: 'Rank users by total time spent listening to music',
       }),
+
+      g.commands.create({
+        name: 'top-songs',
+        description: 'Get list of top songs',
+      }),
     ])
 
     createAll.forEach((result) => {
@@ -141,57 +147,6 @@ async function createCmds() {
         console.log(`Command creation failed for ${guild.name}`)
       }
     })
-
-    // await g.commands.create({
-    //   name: 'ping',
-    //   description: 'Ping the bot',
-    // })
-
-    // await g.commands.create({
-    //   name: 'admin-recreate-cmds',
-    //   description: 'Recreate all commands',
-    // })
-
-    // await g.commands.create({
-    //   name: 'activity',
-    //   description: 'Get user activity',
-    //   options: [
-    //     {
-    //       name: 'user',
-    //       type: Discord.ApplicationCommandOptionType.User,
-    //       description: 'The user to get activity for',
-    //       required: true,
-    //     },
-    //   ],
-    // })
-
-    // await g.commands.create({
-    //   name: 'game-leaderboard',
-    //   description: 'Get user game leaderboard',
-    // })
-
-    // await g.commands.create({
-    //   name: 'top-games',
-    //   description: 'Get list of top games',
-    // })
-
-    // await g.commands.create({
-    //   name: 'top-for-game',
-    //   description: 'Get top users for a game',
-    //   options: [
-    //     {
-    //       name: 'game',
-    //       type: Discord.ApplicationCommandOptionType.String,
-    //       description: 'The game to get top users for',
-    //       required: false,
-    //     },
-    //   ],
-    // })
-
-    // await g.commands.create({
-    //   name: 'music-leaderboard',
-    //   description: 'Rank users by total time spent listening to music',
-    // })
 
     console.log(`Commands created for ${guild.name}`)
   }
@@ -324,8 +279,12 @@ client.on('interactionCreate', async (interaction) => {
     handleTopForGame(interaction)
   }
 
-  if (commandName === 'music') {
+  if (commandName === 'music-leaderboard') {
     handleMusicLeaderboardCmd(interaction)
+  }
+
+  if (commandName === 'top-songs') {
+    handleTopSongs(interaction)
   }
 })
 
