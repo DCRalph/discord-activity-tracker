@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 
 import { prettySeconds } from '../prettySeconds'
 import { inBlacklist, music } from '../groups'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
@@ -86,11 +87,23 @@ async function handleMusicLeaderboardCmd(
         inline: true,
       },
     ])
+
+    await interaction.reply({ embeds: [embed] })
   } catch (e) {
     console.log(e)
-  }
 
-  await interaction.reply({ embeds: [embed] })
+    const embed = prettyEmbeds.general.anErrorOccurred()
+
+    interaction.reply({ embeds: [embed] })
+
+    prisma.error.create({
+      data: {
+        where: 'handleMusicLeaderboardCmd',
+        message: e.message,
+        stack: e.stack,
+      },
+    })
+  }
 }
 
 export { handleMusicLeaderboardCmd }

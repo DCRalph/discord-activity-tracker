@@ -557,6 +557,15 @@ async function handlePresence(
       `[${presenceObj.user.username}, ${presenceObj.guildName}] Error on handle status: ${error}`
     )
 
+    prisma.error.create({
+      data: {
+        where: 'handlePresence',
+        message: error.message,
+        stack: error.stack,
+        extra: `User: ${presenceObj.user.username}, Guild: ${presenceObj.guildName}`,
+      },
+    })
+
     console.log('.')
     console.log('.')
   }

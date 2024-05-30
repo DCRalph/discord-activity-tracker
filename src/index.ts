@@ -4,12 +4,13 @@ import { PrismaClient } from '@prisma/client'
 
 import { handlePresence } from './presenceTracker'
 
+import prettyEmbeds from './prettyEmbeds'
+
 import { handleActivityCmd } from './cmds/activity'
 import { handleGameLeaderboardCmd } from './cmds/gameLeaderboard'
 import { handleTopGames } from './cmds/top-games'
 import { handleTopForGame } from './cmds/top-for-game'
 import { handleMusicLeaderboardCmd } from './cmds/musicLeaderboard'
-import { promises } from 'fs'
 import { handleTopSongs } from './cmds/top-songs'
 
 dotenv.config()
@@ -173,6 +174,7 @@ client.once('ready', async () => {
 })
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
+  try {
   if (newPresence.user?.bot) return
 
   const discordUser = newPresence.user
@@ -209,82 +211,116 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
   console.log('.')
 
   usersProcessing.delete(discordUser.id)
+
+  } catch (e) {
+    console.log(e)
+
+    prisma.error.create({
+      data: {
+        where: 'presenceUpdate',
+
+        message: e.message,
+        stack: e.stack,
+      },
+    })
+  }
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return
+  try {
+    if (!interaction.isCommand()) return
 
-  const { commandName } = interaction
+    const { commandName } = interaction
 
-  if (commandName === 'ping') {
-    const timeTaken = Date.now() - interaction.createdTimestamp
+    if (commandName === 'ping') {
+      const timeTaken = Date.now() - interaction.createdTimestamp
 
-    const reply = await interaction.reply(
-      `Pong! to me(${timeTaken}ms) and back(...ms)`
-    )
+      const reply = await interaction.reply(
+        `Pong! to me(${timeTaken}ms) and back(...ms)`
+      )
 
-    const roundTripTime = Date.now() - reply.createdTimestamp
+      const roundTripTime = Date.now() - reply.createdTimestamp
 
-    reply.edit(`Pong! toDiscord(${timeTaken}ms) and back(${roundTripTime}ms)`)
-  }
+      reply.edit(`Pong! toDiscord(${timeTaken}ms) and back(${roundTripTime}ms)`)
+    }
 
-  if (commandName === 'admin-recreate-cmds') {
-    if (interaction.user.id != coolGuy) {
-      //https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4
-      // send this video as a reply
+    if (commandName === 'admin-recreate-cmds') {
+      if (interaction.user.id != coolGuy) {
+        //https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4
+        // send this video as a reply
 
-      const embed = new Discord.EmbedBuilder()
-        .setTitle('Nope')
-        .setColor('Red')
-        .setDescription('You are not allowed to do that')
+        const embed = new Discord.EmbedBuilder()
+          .setTitle('Nope')
+          .setColor('Red')
+          .setDescription('You are not allowed to do that')
 
+        interaction.reply({
+          embeds: [embed],
+          files: [
+            'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4',
+          ],
+        })
+      } else {
+        const embed = new Discord.EmbedBuilder()
+          .setTitle('Recreating commands')
+          .setColor('Random')
+          .setDescription('Recreating all commands...')
+
+        const reply = await interaction.reply({
+          embeds: [embed],
+        })
+
+        await deleteCmds()
+        await createCmds()
+
+        reply.edit({
+          embeds: [embed.setDescription('Recreating all commands done')],
+        })
+      }
+    }
+
+    if (commandName === 'activity') {
+      handleActivityCmd(interaction)
+    }
+
+    if (commandName === 'game-leaderboard') {
+      handleGameLeaderboardCmd(interaction)
+    }
+
+    if (commandName === 'top-games') {
+      handleTopGames(interaction)
+    }
+
+    if (commandName === 'top-for-game') {
+      handleTopForGame(interaction)
+    }
+
+    if (commandName === 'music-leaderboard') {
+      handleMusicLeaderboardCmd(interaction)
+    }
+
+    if (commandName === 'top-songs') {
+      handleTopSongs(interaction)
+    }
+  } catch (e) {
+    console.log(e)
+
+    prisma.error.create({
+      data: {
+        where: 'interactionCreate',
+
+        message: e.message,
+        stack: e.stack,
+      },
+    })
+
+    const embed = prettyEmbeds.general.anErrorOccurred()
+
+    if (interaction.isRepliable()) {
       interaction.reply({
         embeds: [embed],
-        files: [
-          'https://raw.githubusercontent.com/DCRalph/discord-activity-tracker/main/assets/wrong.mp4',
-        ],
-      })
-    } else {
-      const embed = new Discord.EmbedBuilder()
-        .setTitle('Recreating commands')
-        .setColor('Random')
-        .setDescription('Recreating all commands...')
-
-      const reply = await interaction.reply({
-        embeds: [embed],
-      })
-
-      await deleteCmds()
-      await createCmds()
-
-      reply.edit({
-        embeds: [embed.setDescription('Recreating all commands done')],
       })
     }
-  }
-
-  if (commandName === 'activity') {
-    handleActivityCmd(interaction)
-  }
-
-  if (commandName === 'game-leaderboard') {
-    handleGameLeaderboardCmd(interaction)
-  }
-
-  if (commandName === 'top-games') {
-    handleTopGames(interaction)
-  }
-
-  if (commandName === 'top-for-game') {
-    handleTopForGame(interaction)
-  }
-
-  if (commandName === 'music-leaderboard') {
-    handleMusicLeaderboardCmd(interaction)
-  }
-
-  if (commandName === 'top-songs') {
-    handleTopSongs(interaction)
   }
 })
 

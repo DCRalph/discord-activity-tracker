@@ -54,3 +54,15 @@ model Activity {
   endedAt   DateTime?
   duration  Int?
 }
+
+model Error {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  where     String
+  
+  message   String
+  stack     String
+
+  extra     String?
+}
