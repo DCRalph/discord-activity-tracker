@@ -51,11 +51,10 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     .filter((user) => user.duration > 0)
 
   const embed = new Discord.EmbedBuilder()
-
-  embed.setTitle('Music Leaderboard')
-  embed.setDescription('Rank users by total time spent listening to music')
-  embed.setColor('Random')
-  embed.setTimestamp(now)
+    .setTitle('Music Leaderboard')
+    .setDescription('Rank users by total time spent listening to music')
+    .setColor('Random')
+    .setTimestamp(now)
 
   let indexCol = ''
   let usernameCol = ''
@@ -67,25 +66,29 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
   }
 
-  console.table({ indexCol, usernameCol, durationCol })
+  console.table({ sortedUsers })
 
-  // embed.addFields([
-  //   {
-  //     name: 'Rank',
-  //     value: indexCol,
-  //     inline: true,
-  //   },
-  //   {
-  //     name: 'Username',
-  //     value: usernameCol,
-  //     inline: true,
-  //   },
-  //   {
-  //     name: 'Duration',
-  //     value: durationCol,
-  //     inline: true,
-  //   },
-  // ])
+  try {
+    embed.addFields([
+      {
+        name: 'Rank',
+        value: indexCol,
+        inline: true,
+      },
+      {
+        name: 'Username',
+        value: usernameCol,
+        inline: true,
+      },
+      {
+        name: 'Duration',
+        value: durationCol,
+        inline: true,
+      },
+    ])
+  } catch (e) {
+    console.log(e)
+  }
 
   await interaction.reply({ embeds: [embed] })
 }
