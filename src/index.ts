@@ -55,8 +55,22 @@ async function deleteCmds() {
     console.log()
     console.log(`Guild: ${guild.name}, Commands: ${c.size}`)
 
-    c.forEach(async (command) => {
-      await command.delete()
+    // c.forEach(async (command) => {
+    //   await command.delete()
+    // })
+
+    // make Promise.allSettled()
+
+    const deleteAll = await Promise.allSettled(
+      c.map((command) => command.delete())
+    )
+
+    deleteAll.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        console.log(`Command deleted for ${guild.name}`)
+      } else {
+        console.log(`Command deletion failed for ${guild.name}`)
+      }
     })
   }
 
@@ -69,7 +83,7 @@ async function createCmds() {
 
     // make command creation promise.allsettled
 
-    await Promise.allSettled([
+    const createAll = await Promise.allSettled([
       g.commands.create({
         name: 'ping',
         description: 'Ping the bot',
@@ -120,14 +134,14 @@ async function createCmds() {
         name: 'music-leaderboard',
         description: 'Rank users by total time spent listening to music',
       }),
-    ]).then((results) => {  
-      results.forEach((result) => {
-        if (result.status === 'fulfilled') {
-          console.log(`Command created for ${guild.name}`)
-        } else {
-          console.log(`Command creation failed for ${guild.name}`)
-        }
-      })
+    ])
+
+    createAll.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        console.log(`Command created for ${guild.name}`)
+      } else {
+        console.log(`Command creation failed for ${guild.name}`)
+      }
     })
 
     // await g.commands.create({
