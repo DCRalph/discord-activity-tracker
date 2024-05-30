@@ -62,23 +62,23 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
   }
 
-  embed.addFields({
-    name: 'Rank',
-    value: indexCol,
-    inline: true,
-  })
-
-  embed.addFields({
-    name: 'Username',
-    value: usernameCol,
-    inline: true,
-  })
-
-  embed.addFields({
-    name: 'Duration',
-    value: durationCol,
-    inline: true,
-  })
+  embed.addFields([
+    {
+      name: 'Rank',
+      value: indexCol,
+      inline: true,
+    },
+    {
+      name: 'Username',
+      value: usernameCol,
+      inline: true,
+    },
+    {
+      name: 'Duration',
+      value: durationCol,
+      inline: true,
+    },
+  ])
 
   await interaction.reply({ embeds: [embed] })
 }
