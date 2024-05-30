@@ -1,5 +1,5 @@
 import Discord from 'discord.js'
-import { PrismaClient, User } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 import { prettySeconds } from '../prettySeconds'
 import { inBlacklist, music } from '../groups'
@@ -20,7 +20,7 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     },
   })
 
-  if (!users.length) {
+  if (users.length === 0) {
     await interaction.reply('No users found')
     return
   }
