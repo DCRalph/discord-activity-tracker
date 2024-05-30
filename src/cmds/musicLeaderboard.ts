@@ -6,7 +6,9 @@ import { inBlacklist, music } from '../groups'
 
 const prisma = new PrismaClient()
 
-async function handleMusicCmd(interaction: Discord.CommandInteraction) {
+async function handleMusicLeaderboardCmd(
+  interaction: Discord.CommandInteraction
+) {
   const now = new Date()
 
   const users = await prisma.user.findMany({
@@ -19,8 +21,6 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
       },
     },
   })
-
-  console.log(users)
 
   if (users.length === 0) {
     await interaction.reply('No users found')
@@ -93,4 +93,4 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
   await interaction.reply({ embeds: [embed] })
 }
 
-export { handleMusicCmd }
+export { handleMusicLeaderboardCmd }

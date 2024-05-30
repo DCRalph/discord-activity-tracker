@@ -6,7 +6,7 @@ import { inBlacklist } from '../groups'
 
 const prisma = new PrismaClient()
 
-async function handleActivityLeaderboardCmd(
+async function handleGameLeaderboardCmd(
   interaction: Discord.CommandInteraction
 ) {
   const users = await prisma.user.findMany({
@@ -44,7 +44,7 @@ async function handleActivityLeaderboardCmd(
     .filter((user) => user.duration > 0)
 
   const embed = new Discord.EmbedBuilder()
-    .setTitle('Activity Leaderboard')
+    .setTitle('Game Leaderboard')
     .setDescription('Rank users by total time spent playing games')
     .setColor('Random')
     .setTimestamp(now)
@@ -80,4 +80,4 @@ async function handleActivityLeaderboardCmd(
   interaction.reply({ embeds: [embed] })
 }
 
-export { handleActivityLeaderboardCmd }
+export { handleGameLeaderboardCmd }

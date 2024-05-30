@@ -5,10 +5,11 @@ import { PrismaClient } from '@prisma/client'
 import { handlePresence } from './presenceTracker'
 
 import { handleActivityCmd } from './cmds/activity'
-import { handleActivityLeaderboardCmd } from './cmds/activityLeaderboard'
+import { handleGameLeaderboardCmd } from './cmds/gameLeaderboard'
 import { handleTopGames } from './cmds/top-games'
 import { handleTopForGame } from './cmds/top-for-game'
-import { handleMusicCmd } from './cmds/music'
+import { handleMusicLeaderboardCmd } from './cmds/musicLeaderboard'
+import { promises } from 'fs'
 
 dotenv.config()
 
@@ -66,58 +67,121 @@ async function createCmds() {
   for (const guild of guilds) {
     const g = await client.guilds.fetch(guild.id)
 
-    await g.commands.create({
-      name: 'ping',
-      description: 'Ping the bot',
+    // make command creation promise.allsettled
+
+    await Promise.allSettled([
+      g.commands.create({
+        name: 'ping',
+        description: 'Ping the bot',
+      }),
+
+      g.commands.create({
+        name: 'admin-recreate-cmds',
+        description: 'Recreate all commands',
+      }),
+
+      g.commands.create({
+        name: 'activity',
+        description: 'Get user activity',
+        options: [
+          {
+            name: 'user',
+            type: Discord.ApplicationCommandOptionType.User,
+            description: 'The user to get activity for',
+            required: true,
+          },
+        ],
+      }),
+
+      g.commands.create({
+        name: 'game-leaderboard',
+        description: 'Get user game leaderboard',
+      }),
+
+      g.commands.create({
+        name: 'top-games',
+        description: 'Get list of top games',
+      }),
+
+      g.commands.create({
+        name: 'top-for-game',
+        description: 'Get top users for a game',
+        options: [
+          {
+            name: 'game',
+            type: Discord.ApplicationCommandOptionType.String,
+            description: 'The game to get top users for',
+            required: false,
+          },
+        ],
+      }),
+
+      g.commands.create({
+        name: 'music-leaderboard',
+        description: 'Rank users by total time spent listening to music',
+      }),
+    ]).then((results) => {  
+      results.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          console.log(`Command created for ${guild.name}`)
+        } else {
+          console.log(`Command creation failed for ${guild.name}`)
+        }
+      })
     })
 
-    await g.commands.create({
-      name: 'admin-recreate-cmds',
-      description: 'Recreate all commands',
-    })
+    // await g.commands.create({
+    //   name: 'ping',
+    //   description: 'Ping the bot',
+    // })
 
-    await g.commands.create({
-      name: 'activity',
-      description: 'Get user activity',
-      options: [
-        {
-          name: 'user',
-          type: Discord.ApplicationCommandOptionType.User,
-          description: 'The user to get activity for',
-          required: true,
-        },
-      ],
-    })
+    // await g.commands.create({
+    //   name: 'admin-recreate-cmds',
+    //   description: 'Recreate all commands',
+    // })
 
-    await g.commands.create({
-      name: 'activity-leaderboard',
-      description: 'Get user activity leaderboard',
-    })
+    // await g.commands.create({
+    //   name: 'activity',
+    //   description: 'Get user activity',
+    //   options: [
+    //     {
+    //       name: 'user',
+    //       type: Discord.ApplicationCommandOptionType.User,
+    //       description: 'The user to get activity for',
+    //       required: true,
+    //     },
+    //   ],
+    // })
 
-    await g.commands.create({
-      name: 'top-games',
-      description: 'Get list of top games',
-    })
+    // await g.commands.create({
+    //   name: 'game-leaderboard',
+    //   description: 'Get user game leaderboard',
+    // })
 
-    await g.commands.create({
-      name: 'top-for-game',
-      description: 'Get top users for a game',
-      options: [
-        {
-          name: 'game',
-          type: Discord.ApplicationCommandOptionType.String,
-          description: 'The game to get top users for',
-          required: false,
-        },
-      ],
-    })
+    // await g.commands.create({
+    //   name: 'top-games',
+    //   description: 'Get list of top games',
+    // })
 
-    await g.commands.create({
-      name: 'music',
-      description: 'e',
-    })
+    // await g.commands.create({
+    //   name: 'top-for-game',
+    //   description: 'Get top users for a game',
+    //   options: [
+    //     {
+    //       name: 'game',
+    //       type: Discord.ApplicationCommandOptionType.String,
+    //       description: 'The game to get top users for',
+    //       required: false,
+    //     },
+    //   ],
+    // })
 
-    console.log(`Commands created for ${guild.name}`)
+    // await g.commands.create({
+    //   name: 'music-leaderboard',
+    //   description: 'Rank users by total time spent listening to music',
+    // })
+
+    // console.log(`Commands created for ${guild.name}`)
   }
 }
 
@@ -223,8 +287,8 @@ client.on('interactionCreate', async (interaction) => {
     handleActivityCmd(interaction)
   }
 
-  if (commandName === 'activity-leaderboard') {
-    handleActivityLeaderboardCmd(interaction)
+  if (commandName === 'game-leaderboard') {
+    handleGameLeaderboardCmd(interaction)
   }
 
   if (commandName === 'top-games') {
@@ -236,7 +300,7 @@ client.on('interactionCreate', async (interaction) => {
   }
 
   if (commandName === 'music') {
-    handleMusicCmd(interaction)
+    handleMusicLeaderboardCmd(interaction)
   }
 })
 
