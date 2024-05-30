@@ -20,6 +20,8 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     },
   })
 
+  console.log(users)
+
   if (users.length === 0) {
     await interaction.reply('No users found')
     return
@@ -30,8 +32,6 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
   for (const user of users) {
     let total = 0
     inner: for (const activity of user.activities) {
-      if (inBlacklist(activity.name)) continue inner
-
       total +=
         ~~(activity.duration / 1000) ||
         ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
@@ -69,23 +69,23 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
 
   console.table(sortedUsers)
 
-  embed.addFields([
-    {
-      name: 'Rank',
-      value: indexCol,
-      inline: true,
-    },
-    {
-      name: 'Username',
-      value: usernameCol,
-      inline: true,
-    },
-    {
-      name: 'Duration',
-      value: durationCol,
-      inline: true,
-    },
-  ])
+  // embed.addFields([
+  //   {
+  //     name: 'Rank',
+  //     value: indexCol,
+  //     inline: true,
+  //   },
+  //   {
+  //     name: 'Username',
+  //     value: usernameCol,
+  //     inline: true,
+  //   },
+  //   {
+  //     name: 'Duration',
+  //     value: durationCol,
+  //     inline: true,
+  //   },
+  // ])
 
   await interaction.reply({ embeds: [embed] })
 }
