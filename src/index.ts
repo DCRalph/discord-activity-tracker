@@ -175,43 +175,42 @@ client.once('ready', async () => {
 
 client.on('presenceUpdate', async (oldPresence, newPresence) => {
   try {
-  if (newPresence.user?.bot) return
+    if (newPresence.user?.bot) return
 
-  const discordUser = newPresence.user
-  const guild = newPresence.guild
+    const discordUser = newPresence.user
+    const guild = newPresence.guild
 
-  const userAllowedGuild = userGuildMap.get(discordUser.id)
+    const userAllowedGuild = userGuildMap.get(discordUser.id)
 
-  if (!userAllowedGuild) {
-    userGuildMap.set(discordUser.id, guild.id)
-  } else if (userAllowedGuild !== guild.id) {
-    console.log(
-      `[${discordUser.username}, ${guild.name}]  is in multiple guilds, skipping ${guild.name}...`
-    )
-    return
-  }
+    if (!userAllowedGuild) {
+      userGuildMap.set(discordUser.id, guild.id)
+    } else if (userAllowedGuild !== guild.id) {
+      console.log(
+        `[${discordUser.username}, ${guild.name}]  is in multiple guilds, skipping ${guild.name}...`
+      )
+      return
+    }
 
-  if (!discordUser.id) return
+    if (!discordUser.id) return
 
-  if (usersProcessing.has(discordUser.id)) {
-    console.log(
-      `[${discordUser.username}, ${guild.name}] Already processing...`
-    )
-    return
-  }
+    if (usersProcessing.has(discordUser.id)) {
+      console.log(
+        `[${discordUser.username}, ${guild.name}] Already processing...`
+      )
+      return
+    }
 
-  usersProcessing.add(discordUser.id)
+    usersProcessing.add(discordUser.id)
 
-  console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
+    console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
-  await handlePresence(oldPresence, newPresence, guild)
+    await handlePresence(oldPresence, newPresence, guild)
 
-  console.log(`[${discordUser.username}, ${guild.name}] Done`)
-  console.log('.')
-  console.log('.')
+    console.log(`[${discordUser.username}, ${guild.name}] Done`)
+    console.log('.')
+    console.log('.')
 
-  usersProcessing.delete(discordUser.id)
-
+    usersProcessing.delete(discordUser.id)
   } catch (e) {
     console.log(e)
 
@@ -302,6 +301,8 @@ client.on('interactionCreate', async (interaction) => {
     if (commandName === 'top-songs') {
       handleTopSongs(interaction)
     }
+
+    throw new Error('test error')
   } catch (e) {
     console.log(e)
 
