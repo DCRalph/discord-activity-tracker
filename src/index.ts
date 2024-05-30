@@ -301,8 +301,6 @@ client.on('interactionCreate', async (interaction) => {
     if (commandName === 'top-songs') {
       handleTopSongs(interaction)
     }
-
-    throw new Error('test error')
   } catch (e) {
     console.log(e)
 
