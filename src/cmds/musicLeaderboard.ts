@@ -66,7 +66,7 @@ async function handleMusicLeaderboardCmd(
     durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
   }
 
-  console.table({ sortedUsers })
+  // console.table({ sortedUsers })
 
   try {
     embed.addFields([
