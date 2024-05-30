@@ -1,7 +1,7 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
-import { prettySeconds } from './prettySeconds'
-import { inBlacklist } from './blacklist'
+import { prettySeconds } from '../prettySeconds'
+import { inBlacklist } from '../groups'
 
 const prisma = new PrismaClient()
 

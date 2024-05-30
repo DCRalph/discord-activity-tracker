@@ -2,11 +2,13 @@ import dotenv from 'dotenv'
 import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
-import { handleActivityV2 } from './activity'
-import { handleActivityCmd, handleActivityLeaderboardCmd } from './activityCmd'
-import { handleTopGames } from './top-games'
-import { handleTopForGame } from './top-for-game'
 import { handlePresence } from './presenceTracker'
+
+import { handleActivityCmd } from './cmds/activity'
+import { handleActivityLeaderboardCmd } from './cmds/activityLeaderboard'
+import { handleTopGames } from './cmds/top-games'
+import { handleTopForGame } from './cmds/top-for-game'
+import { handleMusicCmd } from './cmds/music'
 
 dotenv.config()
 
@@ -110,6 +112,11 @@ async function createCmds() {
       ],
     })
 
+    await g.commands.create({
+      name: 'music',
+      description: 'e',
+    })
+
     console.log(`Commands created for ${guild.name}`)
   }
 }
@@ -164,7 +171,6 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
 
   console.log(`[${discordUser.username}, ${guild.name}] Processing...`)
 
-  // await handleActivityV2(oldPresence, newPresence, guild)
   await handlePresence(oldPresence, newPresence, guild)
 
   console.log(`[${discordUser.username}, ${guild.name}] Done`)
@@ -227,6 +233,10 @@ client.on('interactionCreate', async (interaction) => {
 
   if (commandName === 'top-for-game') {
     handleTopForGame(interaction)
+  }
+
+  if (commandName === 'music') {
+    handleMusicCmd(interaction)
   }
 })
 
