@@ -67,7 +67,7 @@ async function handleMusicCmd(interaction: Discord.CommandInteraction) {
     durationCol += `${prettySeconds(sortedUsers[i].duration)}\n`
   }
 
-  console.table(sortedUsers)
+  console.table({ indexCol, usernameCol, durationCol })
 
   // embed.addFields([
   //   {
