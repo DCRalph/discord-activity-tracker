@@ -2,7 +2,7 @@ import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
 import { prettySeconds } from '../prettySeconds'
-import { inBlacklist } from '../groups'
+import { blacklistedActivities, inBlacklist } from '../groups'
 
 const prisma = new PrismaClient()
 
@@ -11,7 +11,12 @@ async function handleGameLeaderboardCmd(
 ) {
   const users = await prisma.user.findMany({
     include: {
-      activities: { where: { activityType: 'activity' } },
+      activities: {
+        where: {
+          activityType: 'activity',
+          name: { notIn: blacklistedActivities },
+        },
+      },
     },
   })
 
@@ -23,7 +28,7 @@ async function handleGameLeaderboardCmd(
 
     let total = 0
     inner: for (const activity of activities) {
-      if (inBlacklist(activity.name)) continue inner
+      // if (inBlacklist(activity.name)) continue inner
 
       total +=
         ~~(activity.duration / 1000) ||

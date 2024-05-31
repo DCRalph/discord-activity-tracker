@@ -23,4 +23,4 @@ function isMusic(activity1: string) {
   return music.includes(activity1)
 }
 
-export { inBlacklist, music }
+export { blacklistedActivities, inBlacklist, music }
