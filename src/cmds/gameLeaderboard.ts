@@ -36,6 +36,7 @@ async function handleGameLeaderboardCmd(
     }
 
     userTotals[user.username] = total
+    console.log(user.username, total)
   }
 
   const sortedUsers = Object.entries(userTotals)
