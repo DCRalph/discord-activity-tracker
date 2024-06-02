@@ -43,6 +43,7 @@ type WhatToDo = {
   } | null
   oldActivities: ActivityItem[]
   newActivities: ActivityItem[]
+  toDelete: string[]
   nothing: boolean
 }
 
@@ -88,6 +89,7 @@ async function preProcessPresence(presence: Presence) {
     status: null,
     oldActivities: [],
     newActivities: [],
+    toDelete: [],
     nothing: true,
   }
 
@@ -154,6 +156,28 @@ async function preProcessPresence(presence: Presence) {
     //   )
     //   continue
     // }
+
+    // check if the activity is already in db with the same name but no details and state
+    const dbActivity = await prisma.activity.findFirst({
+      where: {
+        userId: presence.user.id,
+        type: activity.type,
+        name: activity.name,
+        details: null,
+        state: null,
+        endedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    if (dbActivity) {
+      console.log(
+        `[${presence.user.username}, ${presence.guildName}] [${activity.type}] ${activity.name} is already in db with no details and state. Queued for deletion...`
+      )
+      WhatToDo.toDelete.push(dbActivity.id)
+    }
 
     WhatToDo.newActivities.push(activity)
     WhatToDo.nothing = false
@@ -257,6 +281,24 @@ async function processPresence(WhatToDo: WhatToDo) {
       `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] nothing to do`
     )
     return
+  }
+
+  if (WhatToDo.toDelete.length > 0) {
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] deleting #${WhatToDo.toDelete.length} activities form db...`
+    )
+
+    const deleted = await prisma.activity.deleteMany({
+      where: {
+        id: {
+          in: WhatToDo.toDelete,
+        },
+      },
+    })
+
+    console.log(
+      `[${WhatToDo.presence.user.username}, ${WhatToDo.presence.guildName}] deleted #${deleted.count} activities`
+    )
   }
 
   if (WhatToDo.status) {
