@@ -45,7 +45,7 @@ async function withoutUser(interaction: Discord.CommandInteraction) {
   for (let i = 0; i < recentSongs.length; i++) {
     const song = recentSongs[i]
 
-    indexCol += `<t:${song.createdAt.getTime()}:R>\n`
+    indexCol += `<t:${song.createdAt.getTime()/1000}:R>\n`
     songCol += `${song.details}\n`
     userCol += `${song.user.username}\n`
   }
@@ -111,7 +111,7 @@ async function withUser(
   for (let i = 0; i < recentSongs.length; i++) {
     const song = recentSongs[i]
 
-    indexCol += `<t:${song.createdAt.getTime()}:R>\n`
+    indexCol += `<t:${song.createdAt.getTime()/1000}:R>\n`
     songCol += `${song.details}\n`
     timeCol += `${prettySeconds(song.duration)}\n`
   }
