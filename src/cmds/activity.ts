@@ -68,7 +68,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
 
   const activityFields: Discord.APIEmbedField[] = Object.entries(
     activityTotals
-  ).map(([name, duration]) => {
+  ).sort((a, b) => b[1] - a[1]).map(([name, duration]) => {
     return {
       name,
       value: prettySeconds(duration),
