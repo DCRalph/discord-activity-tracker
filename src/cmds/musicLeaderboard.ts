@@ -1,7 +1,7 @@
 import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
-import { prettySeconds } from '../prettySeconds'
+import { getDuration, prettySeconds } from '../prettySeconds'
 import { inBlacklist, music } from '../groups'
 import prettyEmbeds from '../prettyEmbeds'
 
@@ -33,9 +33,7 @@ async function handleMusicLeaderboardCmd(
   for (const user of users) {
     let total = 0
     inner: for (const activity of user.activities) {
-      total +=
-        ~~(activity.duration / 1000) ||
-        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+      total += getDuration(activity)
     }
 
     userTotals[user.username] = total

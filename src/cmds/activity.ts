@@ -1,7 +1,7 @@
 import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
-import { prettySeconds } from '../prettySeconds'
+import { getDuration, prettySeconds } from '../prettySeconds'
 
 const prisma = new PrismaClient()
 
@@ -40,10 +40,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
 
   for (const activity of activities) {
     if (activity.activityType == 'activity') {
-      const duration =
-        activity.duration !== null
-          ? ~~(activity.duration / 1000)
-          : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+      const duration = getDuration(activity)
 
       if (activityTotals[activity.name]) {
         activityTotals[activity.name] += duration
@@ -54,10 +51,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       activity.activityType == 'status' &&
       activity.type != 'offline'
     ) {
-      const duration =
-        activity.duration !== null
-          ? ~~(activity.duration / 1000)
-          : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+      const duration = getDuration(activity)
 
       if (statusTotals[activity.type]) {
         statusTotals[activity.type] += duration

@@ -1,6 +1,6 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
-import { prettySeconds } from '../prettySeconds'
+import { getDuration, prettySeconds } from '../prettySeconds'
 import { inBlacklist } from '../groups'
 
 const prisma = new PrismaClient()
@@ -90,10 +90,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   let userTotals: Record<string, number> = {}
 
   for (const activity of activities) {
-    const duration =
-      activity.duration !== null
-        ? ~~(activity.duration / 1000)
-        : ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+    const duration = getDuration(activity)
 
     if (userTotals[activity.user.username]) {
       userTotals[activity.user.username] += duration

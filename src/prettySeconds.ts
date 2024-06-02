@@ -21,4 +21,16 @@ function prettySeconds(seconds: number) {
   return result.trim()
 }
 
-export { prettySeconds }
+function getDuration(activity: any) {
+  if (
+    activity.duration !== null &&
+    activity.duration !== undefined &&
+    activity.duration !== 0
+  ) {
+    return ~~(activity.duration / 1000)
+  } else {
+    return ~~((new Date().getTime() - activity.createdAt.getTime()) / 1000)
+  }
+}
+
+export { prettySeconds, getDuration }

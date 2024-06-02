@@ -1,7 +1,7 @@
 import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
-import { prettySeconds } from '../prettySeconds'
+import { getDuration, prettySeconds } from '../prettySeconds'
 import { blacklistedActivities, inBlacklist } from '../groups'
 
 const prisma = new PrismaClient()
@@ -30,10 +30,7 @@ async function handleGameLeaderboardCmd(
     inner: for (const activity of activities) {
       // if (inBlacklist(activity.name)) continue inner
 
-      total +=
-        ~~(activity.duration / 1000) ||
-        // ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
-        0
+      total += getDuration(activity)
     }
 
     userTotals[user.username] = total
