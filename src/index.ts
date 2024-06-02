@@ -13,6 +13,7 @@ import { handleTopForGame } from './cmds/top-for-game'
 import { handleMusicLeaderboardCmd } from './cmds/musicLeaderboard'
 import { handleTopSongs } from './cmds/top-songs'
 import { updateBotActivity } from './updateBotActivity'
+import { handleRecentSongsCmd } from './cmds/recentSongs'
 
 dotenv.config()
 
@@ -141,6 +142,19 @@ async function createCmds() {
       g.commands.create({
         name: 'top-songs',
         description: 'Get list of top songs',
+      }),
+
+      g.commands.create({
+        name: 'recent-songs',
+        description: 'Get list of recent songs',
+        options: [
+          {
+            name: 'user',
+            type: Discord.ApplicationCommandOptionType.User,
+            description: 'The user to get recent songs for',
+            required: false,
+          },
+        ],
       }),
     ])
 
@@ -302,6 +316,10 @@ client.on('interactionCreate', async (interaction) => {
 
     if (commandName === 'top-songs') {
       handleTopSongs(interaction)
+    }
+
+    if (commandName === 'recent-songs') {
+      handleRecentSongsCmd(interaction)
     }
   } catch (e) {
     console.log(e)
