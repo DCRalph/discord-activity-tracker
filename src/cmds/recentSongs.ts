@@ -99,7 +99,7 @@ async function withUser(
   }
 
   const embed = new Discord.EmbedBuilder()
-    .setTitle('Recent Songs')
+    .setTitle('Recent Songs for ' + discordUser.username)
     .setDescription('Most recent songs played')
     .setColor('Random')
     .setTimestamp(now)
@@ -113,7 +113,7 @@ async function withUser(
 
     indexCol += `<t:${~~(song.createdAt.getTime() / 1000)}:R>\n`
     songCol += `${song.details}\n`
-    timeCol += `${prettySeconds(song.duration)}\n`
+    // timeCol += `${prettySeconds(~~(song.duration / 1000))}\n`
   }
 
   embed.addFields([
@@ -127,11 +127,11 @@ async function withUser(
       value: songCol,
       inline: true,
     },
-    {
-      name: 'Time',
-      value: timeCol,
-      inline: true,
-    },
+    // {
+    //   name: 'Time',
+    //   value: timeCol,
+    //   inline: true,
+    // },
   ])
 
   await interaction.reply({
