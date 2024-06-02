@@ -140,7 +140,7 @@ async function withUser(
 }
 
 async function handleRecentSongsCmd(interaction: Discord.CommandInteraction) {
-  const discordUser = interaction.options.get('user', true)?.user
+  const discordUser = interaction.options.get('user', false)?.user
 
   if (!discordUser) {
     await withoutUser(interaction)
