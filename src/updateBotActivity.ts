@@ -18,7 +18,7 @@ async function set(client: Discord.Client) {
   const userCount = await prisma.user.count()
   const activityCount = await prisma.activity.count()
 
-  const botPresence = `always watching you...\n| ${serverCount} servers | ${userCount} users | ${activityCount} activities`
+  const botPresence = `always watching you...   | ${serverCount} servers | ${userCount} users | ${activityCount} activities`
 
   const botActivity: Discord.ActivityOptions = {
     name: botPresence,
