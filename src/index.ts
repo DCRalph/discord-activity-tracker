@@ -12,6 +12,7 @@ import { handleTopGames } from './cmds/top-games'
 import { handleTopForGame } from './cmds/top-for-game'
 import { handleMusicLeaderboardCmd } from './cmds/musicLeaderboard'
 import { handleTopSongs } from './cmds/top-songs'
+import { updateBotActivity } from './updateBotActivity'
 
 dotenv.config()
 
@@ -156,7 +157,8 @@ async function createCmds() {
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user?.tag}!`)
 
-  client.user?.setActivity(botActivity)
+  // client.user?.setActivity(botActivity)
+  updateBotActivity(client)
 
   guilds = client.guilds.cache.map((guild) => {
     return {
