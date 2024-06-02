@@ -32,12 +32,15 @@ async function handleGameLeaderboardCmd(
 
       total +=
         ~~(activity.duration / 1000) ||
-        ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+        // ~~((now.getTime() - activity.createdAt.getTime()) / 1000)
+        0
     }
 
     userTotals[user.username] = total
     console.log(user.username, total)
   }
+
+  
 
   const sortedUsers = Object.entries(userTotals)
     .sort((a, b) => b[1] - a[1])
