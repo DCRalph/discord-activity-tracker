@@ -613,7 +613,7 @@ async function handlePresence(
   }
 
   // console.log('presenceObj', inspect(presenceObj, { depth: null }))
-  console.log('WhatToDo', inspect(WhatToDo, { depth: null }))
+  // console.log('WhatToDo', inspect(WhatToDo, { depth: null }))
 }
 
 export { handlePresence }
