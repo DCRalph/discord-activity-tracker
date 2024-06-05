@@ -343,4 +343,15 @@ client.on('interactionCreate', async (interaction) => {
   }
 })
 
-client.login(process.env.DISCORD_TOKEN)
+// check if db is on
+const dbConnect = prisma.$connect()
+
+dbConnect.then(() => {
+  client.login(process.env.DISCORD_TOKEN)
+})
+
+dbConnect.catch((e) => {
+  console.log('Error connecting to db')
+  console.log(e)
+  process.exit(1)
+})
