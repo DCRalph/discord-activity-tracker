@@ -9,6 +9,17 @@ const prisma = new PrismaClient()
 async function handleGameLeaderboardCmd(
   interaction: Discord.CommandInteraction
 ) {
+
+  const embedStart = new Discord.EmbedBuilder() 
+    .setTitle('Game Leaderboard')
+    .setDescription('Rank users by total time spent playing games')
+    .setColor('Random')
+    .setTimestamp(new Date())
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
+
+
+
   const users = await prisma.user.findMany({
     include: {
       activities: {
@@ -83,7 +94,7 @@ async function handleGameLeaderboardCmd(
     },
   ])
 
-  interaction.reply({ embeds: [embed] })
+  reply.edit({ embeds: [embed] })
 }
 
 export { handleGameLeaderboardCmd }
