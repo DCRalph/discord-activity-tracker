@@ -91,6 +91,8 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
     finalList.push({ game, duration, highestUser, userTime })
   }
 
+  finalList.sort((a, b) => b.duration - a.duration)
+
   // let gameTotalsArray = Object.entries(gameTotals)
   // gameTotalsArray.sort((a, b) => b[1] - a[1])
 
