@@ -20,9 +20,20 @@ function message(message: string) {
   return embed
 }
 
+function titleAndDesc(title: string, desc: string) {
+  const embed = new Discord.EmbedBuilder()
+
+  embed.setTitle(title)
+  embed.setColor('Random')
+  embed.setDescription(desc)
+
+  return embed
+}
+
 const general = {
   anErrorOccurred,
   message,
+  titleAndDesc,
 }
 
 export default { general }

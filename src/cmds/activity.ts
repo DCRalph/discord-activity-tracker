@@ -2,19 +2,35 @@ import Discord from 'discord.js'
 import { PrismaClient } from '@prisma/client'
 
 import { getDuration, prettySeconds } from '../prettySeconds'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
 async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   const discordUser = interaction.options.get('user', true)?.user
 
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Activity Summary ' + discordUser.username,
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
+
   if (!discordUser) {
-    interaction.reply('User required')
+    const embed = prettyEmbeds.general.titleAndDesc(
+      'Activity Summary',
+      'No user found'
+    )
+    reply.edit({ embeds: [embed] })
     return
   }
 
   if (discordUser.bot) {
-    interaction.reply('Bot users are not supported')
+    const embed = prettyEmbeds.general.titleAndDesc(
+      'Activity Summary',
+      'No activities found'
+    )
+    reply.edit({ embeds: [embed] })
     return
   }
 
@@ -28,7 +44,11 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   })
 
   if (!user) {
-    interaction.reply('User not found')
+    const embed = prettyEmbeds.general.titleAndDesc(
+      'Activity Summary ' + discordUser.username,
+      'No activities found'
+    )
+    reply.edit({ embeds: [embed] })
     return
   }
 
@@ -66,15 +86,15 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     .setColor('Random')
     .setTimestamp(now)
 
-  const activityFields: Discord.APIEmbedField[] = Object.entries(
-    activityTotals
-  ).sort((a, b) => b[1] - a[1]).map(([name, duration]) => {
-    return {
-      name,
-      value: prettySeconds(duration),
-      inline: true,
-    }
-  })
+  const activityFields: Discord.APIEmbedField[] = Object.entries(activityTotals)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, duration]) => {
+      return {
+        name,
+        value: prettySeconds(duration),
+        inline: true,
+      }
+    })
 
   const statusFields: Discord.APIEmbedField[] = Object.entries(
     statusTotals
@@ -103,7 +123,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   ])
   embed.addFields(statusFields)
 
-  interaction.reply({ embeds: [embed] })
+  reply.edit({ embeds: [embed] })
 }
 
 export { handleActivityCmd }

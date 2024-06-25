@@ -2,6 +2,7 @@ import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 import { getDuration, prettySeconds } from '../prettySeconds'
 import { inBlacklist } from '../groups'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
@@ -32,15 +33,28 @@ async function getUniqueGames() {
 async function handleTopForGame(interaction: Discord.CommandInteraction) {
   const game = interaction.options.get('game', false)?.value as string
 
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    `Top Users for ${game}`,
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
+
   if (!game || inBlacklist(game)) {
     const games = await getUniqueGames()
 
     let msg = 'No game provided, valid games are:\n'
-    if (games.size) {
-      msg += [...games].join('\n')
+
+    for (const game of games) {
+      msg += game + '\n'
     }
 
-    interaction.reply(msg)
+    const embed = new Discord.EmbedBuilder()
+    embed.setTitle('Top Users for Game')
+    embed.setDescription(msg)
+    embed.setColor('Random')
+
+    await reply.edit({ embeds: [embed] })
 
     return
   }
@@ -75,12 +89,17 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
   if (!activities.length) {
     const games = await getUniqueGames()
 
-    let msg = 'No users found for game, valid games are:\n'
-    if (games.size) {
-      msg += [...games].join('\n')
-    }
+    const embed = new Discord.EmbedBuilder()
+    embed.setTitle('Top Users for Game')
+    embed.setDescription('No activities found for game')
+    embed.setColor('Random')
+    embed.addFields({
+      name: 'Valid games',
+      value: [...games].join('\n'),
+      inline: false,
+    })
 
-    interaction.reply(msg)
+    await reply.edit({ embeds: [embed] })
 
     return
   }
@@ -126,7 +145,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     i++
   }
 
-  interaction.reply({ embeds: [embed] })
+  await reply.edit({ embeds: [embed] })
 }
 
 export { handleTopForGame }

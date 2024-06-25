@@ -10,6 +10,13 @@ const prisma = new PrismaClient()
 async function handleMusicLeaderboardCmd(
   interaction: Discord.CommandInteraction
 ) {
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Music Leaderboard',
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
+
   const now = new Date()
 
   const users = await prisma.user.findMany({
@@ -24,7 +31,11 @@ async function handleMusicLeaderboardCmd(
   })
 
   if (users.length === 0) {
-    await interaction.reply('No users found')
+    const embed = prettyEmbeds.general.titleAndDesc(
+      'Music Leaderboard',
+      'No users found'
+    )
+    reply.edit({ embeds: [embed] })
     return
   }
 
@@ -86,7 +97,7 @@ async function handleMusicLeaderboardCmd(
       },
     ])
 
-    await interaction.reply({ embeds: [embed] })
+    await reply.edit({ embeds: [embed] })
   } catch (e) {
     console.log(e)
 

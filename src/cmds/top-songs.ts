@@ -1,12 +1,19 @@
 import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
-import { prettySeconds } from '../prettySeconds'
 import { inBlacklist, music } from '../groups'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
 async function handleTopSongs(interaction: Discord.CommandInteraction) {
   // get all users and group by game
+
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Top Songs',
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
 
   const now = new Date()
 
@@ -22,7 +29,11 @@ async function handleTopSongs(interaction: Discord.CommandInteraction) {
   })
 
   if (users.length === 0) {
-    await interaction.reply('No users found')
+    const embed = prettyEmbeds.general.titleAndDesc(
+      'Top Songs',
+      'No users found'
+    )
+    reply.edit({ embeds: [embed] })
     return
   }
 
@@ -49,7 +60,9 @@ async function handleTopSongs(interaction: Discord.CommandInteraction) {
 
   const embed = new Discord.EmbedBuilder()
     .setTitle('Top Songs')
-    .setDescription('Rank songs by total plays. Unique songs: ' + sortedSongs.length)
+    .setDescription(
+      'Rank songs by total plays. Unique songs: ' + sortedSongs.length
+    )
     .setColor('Random')
     .setTimestamp(now)
 
@@ -83,7 +96,7 @@ async function handleTopSongs(interaction: Discord.CommandInteraction) {
     },
   ])
 
-  await interaction.reply({ embeds: [embed] })
+  await reply.edit({ embeds: [embed] })
 }
 
 export { handleTopSongs }

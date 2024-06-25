@@ -3,22 +3,19 @@ import { PrismaClient } from '@prisma/client'
 
 import { getDuration, prettySeconds } from '../prettySeconds'
 import { blacklistedActivities, inBlacklist } from '../groups'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
 async function handleGameLeaderboardCmd(
   interaction: Discord.CommandInteraction
 ) {
-
-  const embedStart = new Discord.EmbedBuilder() 
-    .setTitle('Game Leaderboard')
-    .setDescription('Rank users by total time spent playing games')
-    .setColor('Random')
-    .setTimestamp(new Date())
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Game Leaderboard',
+    'Loading...'
+  )
 
   const reply = await interaction.reply({ embeds: [embedStart] })
-
-
 
   const users = await prisma.user.findMany({
     include: {
@@ -45,10 +42,8 @@ async function handleGameLeaderboardCmd(
     }
 
     userTotals[user.username] = total
-    console.log(user.username, total)
+    // console.log(user.username, total)
   }
-
-  
 
   const sortedUsers = Object.entries(userTotals)
     .sort((a, b) => b[1] - a[1])

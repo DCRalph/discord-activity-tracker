@@ -2,11 +2,19 @@ import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 import { getDuration, prettySeconds } from '../prettySeconds'
 import { inBlacklist } from '../groups'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
 async function handleTopGames(interaction: Discord.CommandInteraction) {
   // get all users and group by game
+
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Top Games',
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
 
   const now = new Date()
 
@@ -83,7 +91,7 @@ async function handleTopGames(interaction: Discord.CommandInteraction) {
     i++
   }
 
-  interaction.reply({ embeds: [embed] })
+  await reply.edit({ embeds: [embed] })
 }
 
 export { handleTopGames }

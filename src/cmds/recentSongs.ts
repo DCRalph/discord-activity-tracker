@@ -2,11 +2,19 @@ import Discord from 'discord.js'
 import { PrismaClient, User } from '@prisma/client'
 import { prettySeconds } from '../prettySeconds'
 import { inBlacklist, music } from '../groups'
+import prettyEmbeds from '../prettyEmbeds'
 
 const prisma = new PrismaClient()
 
 async function withoutUser(interaction: Discord.CommandInteraction) {
   const now = new Date()
+
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Recent Songs',
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
 
   const recentSongs = await prisma.activity.findMany({
     where: {
@@ -28,7 +36,11 @@ async function withoutUser(interaction: Discord.CommandInteraction) {
   })
 
   if (recentSongs.length === 0) {
-    await interaction.reply('No recent songs found')
+    const embed = prettyEmbeds.general.titleAndDesc(
+      'Recent Songs',
+      'No recent songs found'
+    )
+    await reply.edit({ embeds: [embed] })
     return
   }
 
@@ -68,9 +80,7 @@ async function withoutUser(interaction: Discord.CommandInteraction) {
     },
   ])
 
-  await interaction.reply({
-    embeds: [embed],
-  })
+  await reply.edit({ embeds: [embed] })
 }
 
 async function withUser(
@@ -78,6 +88,13 @@ async function withUser(
   discordUser: Discord.User
 ) {
   const now = new Date()
+
+  const embedStart = prettyEmbeds.general.titleAndDesc(
+    'Recent Songs for ' + discordUser.username,
+    'Loading...'
+  )
+
+  const reply = await interaction.reply({ embeds: [embedStart] })
 
   const recentSongs = await prisma.activity.findMany({
     where: {
@@ -94,7 +111,10 @@ async function withUser(
   })
 
   if (recentSongs.length === 0) {
-    await interaction.reply('No recent songs found for this user')
+    const embed = prettyEmbeds.general.message(
+      'No recent songs found for ' + discordUser.username
+    )
+    await reply.edit({ embeds: [embed] })
     return
   }
 
@@ -134,9 +154,7 @@ async function withUser(
     // },
   ])
 
-  await interaction.reply({
-    embeds: [embed],
-  })
+  await reply.edit({ embeds: [embed] })
 }
 
 async function handleRecentSongsCmd(interaction: Discord.CommandInteraction) {
