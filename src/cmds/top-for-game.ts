@@ -79,7 +79,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     )
   ) {
     activities = activities.filter((activity) => {
-      return activity.name == game
+      return activity.name.toLowerCase() == game.toLowerCase()
     })
   } else {
     activities = activities.filter((activity) => {
@@ -87,11 +87,11 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     })
   }
 
-  console.log(activities)
+  // console.log(activities)
 
   if (!activities.length) {
     const games = await getUniqueGames()
-    console.log(games)
+    // console.log(games)
 
     const gamesChunked: string[][] = [...games].reduce((acc, game, i) => {
       const index = Math.floor(i / 25)
