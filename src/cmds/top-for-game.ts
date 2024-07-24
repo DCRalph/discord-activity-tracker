@@ -90,15 +90,32 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     const games = await getUniqueGames()
     console.log(games)
 
+    const gamesChunked: string[][] = [...games].reduce((acc, game, i) => {
+      const index = Math.floor(i / 25)
+      if (!acc[index]) {
+        acc[index] = []
+      }
+      acc[index].push(game)
+      return acc
+    }, [])
+
     const embed = new Discord.EmbedBuilder()
     embed.setTitle('Top Users for Game')
     embed.setDescription('No activities found for game')
     embed.setColor('Random')
-    embed.addFields({
-      name: 'Valid games',
-      value: [...games].join('\n'),
-      inline: false,
-    })
+    // embed.addFields({
+    //   name: 'Valid games',
+    //   value: [...games].join('\n'),
+    //   inline: false,
+    // })
+
+    for (const chunk of gamesChunked) {
+      embed.addFields({
+        name: 'Valid games',
+        value: chunk.join('\n'),
+        inline: false,
+      })
+    }
 
     await reply.edit({ embeds: [embed] })
 
