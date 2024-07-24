@@ -84,7 +84,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     })
   }
 
-  // console.log(activities)
+  console.log(activities)
 
   if (!activities.length) {
     const games = await getUniqueGames()
