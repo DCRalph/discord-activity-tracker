@@ -88,6 +88,7 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
 
   if (!activities.length) {
     const games = await getUniqueGames()
+    console.log(games)
 
     const embed = new Discord.EmbedBuilder()
     embed.setTitle('Top Users for Game')
