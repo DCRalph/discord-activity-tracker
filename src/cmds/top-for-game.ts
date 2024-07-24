@@ -127,6 +127,8 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     userTotalsMap.set(username, duration)
   }
 
+  console.log(userTotalsMap)
+
   const embed = new Discord.EmbedBuilder()
   embed.setTitle(`Top users for ${fullGameName}`)
   embed.setColor('Random')
@@ -137,11 +139,15 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
       break
     }
 
-    embed.addFields({
-      name: `${i}. ${username}`,
-      value: prettySeconds(duration),
-      inline: false,
-    })
+    try {
+      embed.addFields({
+        name: `${i}. ${username}`,
+        value: prettySeconds(duration),
+        inline: false,
+      })
+    } catch (error) {
+      console.error('Error adding field:', error, { username, duration })
+    }
     i++
   }
 

@@ -1,5 +1,6 @@
 SELECT 
     "User"."username",
+	"User"."id",
     COUNT("Activity"."id") AS activity_count
 FROM 
     "User"
