@@ -27,7 +27,10 @@ async function getUniqueGames() {
     }
   }
 
-  return gameTotals
+  // sort alphabetically
+  return [...gameTotals].sort()
+
+  // return gameTotals
 }
 
 async function handleTopForGame(interaction: Discord.CommandInteraction) {
@@ -109,9 +112,10 @@ async function handleTopForGame(interaction: Discord.CommandInteraction) {
     //   inline: false,
     // })
 
-    for (const chunk of gamesChunked) {
+    for (let i = 0; i < gamesChunked.length; i++) {
+      const chunk = gamesChunked[i]
       embed.addFields({
-        name: 'Valid games',
+        name: `Valid games (${i + 1}/${gamesChunked.length})`,
         value: chunk.join('\n'),
         inline: false,
       })
