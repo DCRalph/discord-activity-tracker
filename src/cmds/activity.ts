@@ -124,6 +124,9 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     return resultArray
   }, [])
 
+  console.log(activityFieldsChunks)
+  console.log(statusFieldsChunks)
+
   embed.addFields({
     name: 'Activity',
     value: 'Total activity time',
