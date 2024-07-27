@@ -97,7 +97,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     })
 
   const activityFieldsChunks = activityFields.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / 25)
+    const chunkIndex = Math.floor(index / 24)
     if (!resultArray[chunkIndex]) {
       resultArray[chunkIndex] = [] // start a new chunk
     }
@@ -116,7 +116,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
   })
 
   const statusFieldsChunks = statusFields.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / 25)
+    const chunkIndex = Math.floor(index / 24)
     if (!resultArray[chunkIndex]) {
       resultArray[chunkIndex] = [] // start a new chunk
     }
