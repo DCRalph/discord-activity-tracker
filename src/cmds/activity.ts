@@ -97,7 +97,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     })
 
   const activityFieldsChunks = activityFields.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / 24)
+    const chunkIndex = Math.floor(index / 20)
     if (!resultArray[chunkIndex]) {
       resultArray[chunkIndex] = [] // start a new chunk
     }
@@ -117,19 +117,6 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
 
   console.log(activityFieldsChunks)
 
-  embed.addFields({
-    name: 'Activity',
-    value: 'Total activity time',
-    inline: false,
-  })
-  for (const activityFieldsChunk of activityFieldsChunks) {
-    console.log(activityFieldsChunk)
-    for (const activityField of activityFieldsChunk) {
-      console.log(activityField)
-    }
-    embed.addFields(activityFieldsChunk)
-  }
-
   embed.addFields([
     { name: '\u200B', value: '\u200B' }, // Add a blank field
     {
@@ -138,10 +125,26 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       inline: false,
     },
   ])
-
   embed.addFields(statusFields)
 
-  reply.edit({ embeds: [embed] })
+  await reply.edit({ embeds: [embed] })
+
+  for (const activityFieldsChunk of activityFieldsChunks) {
+    const subEmbed = new Discord.EmbedBuilder()
+      .setColor('Random')
+      .setTimestamp(now)
+
+      subEmbed.addFields({
+        name: 'Activity',
+        value: 'Total activity time',
+        inline: false,
+      })
+
+      subEmbed.addFields(activityFieldsChunk)
+
+    await interaction.followUp({ embeds: [subEmbed] })
+  }
+
 }
 
 export { handleActivityCmd }
