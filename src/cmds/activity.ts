@@ -115,17 +115,7 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     }
   })
 
-  const statusFieldsChunks = statusFields.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / 24)
-    if (!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [] // start a new chunk
-    }
-    resultArray[chunkIndex].push(item)
-    return resultArray
-  }, [])
-
   console.log(activityFieldsChunks)
-  console.log(statusFieldsChunks)
 
   embed.addFields({
     name: 'Activity',
@@ -133,6 +123,10 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
     inline: false,
   })
   for (const activityFieldsChunk of activityFieldsChunks) {
+    console.log(activityFieldsChunk)
+    for (const activityField of activityFieldsChunk) {
+      console.log(activityField)
+    }
     embed.addFields(activityFieldsChunk)
   }
 
@@ -144,9 +138,8 @@ async function handleActivityCmd(interaction: Discord.CommandInteraction) {
       inline: false,
     },
   ])
-  for (const statusFieldsChunk of statusFieldsChunks) {
-    embed.addFields(statusFieldsChunk)
-  }
+
+  embed.addFields(statusFields)
 
   reply.edit({ embeds: [embed] })
 }
